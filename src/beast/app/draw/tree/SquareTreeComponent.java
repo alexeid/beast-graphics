@@ -9,6 +9,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Path2D;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Alexei Drummond
@@ -16,27 +18,26 @@ import java.awt.geom.Path2D;
 public class SquareTreeComponent extends TreeComponent {
 
 
-    public SquareTreeComponent(Tree tree, double labelOffset, boolean showInternodeIntervals) {
+    public SquareTreeComponent(List<Tree> trees, double labelOffset, boolean showInternodeIntervals) {
 
-        super(tree, labelOffset, false);
-        this.showInternodeIntervals = showInternodeIntervals;
+        super(trees, labelOffset, false);
+        setShowInternodeIntervals(showInternodeIntervals);
     }
 
-    public SquareTreeComponent(Tree tree, double nodeHeightScale, double nodeSpacing,
+    public SquareTreeComponent(List<Tree> trees, double nodeHeightScale, double nodeSpacing,
                                double labelOffset,
                                boolean showInternodeIntervals) {
 
-        super(tree, nodeHeightScale, nodeSpacing, labelOffset, false, showInternodeIntervals);
+        super(trees, nodeHeightScale, nodeSpacing, labelOffset, false, showInternodeIntervals);
     }
 
     void drawBranch(Tree tree, Node node, Node childNode, Graphics2D g) {
 
-        double height = getScaledOffsetNodeHeight(node);
-        double childHeight = getScaledOffsetNodeHeight(childNode);
+        double height = getScaledOffsetNodeHeight(tree, node.getHeight());
+        double childHeight = getScaledOffsetNodeHeight(tree, childNode.getHeight());
 
         double pos = getNodePosition(node);
         double childPos = getNodePosition(childNode);
-
 
 
         Path2D path = new GeneralPath();
@@ -47,7 +48,7 @@ public class SquareTreeComponent extends TreeComponent {
         g.draw(path);
 
         if (branchLabels != null && !branchLabels.equals("")) {
-            
+
             Object metaData = childNode.getMetaData(branchLabels);
             String branchLabel;
             if (metaData instanceof Number) {
@@ -55,7 +56,7 @@ public class SquareTreeComponent extends TreeComponent {
             } else {
                 branchLabel = metaData.toString();
             }
-            drawNode(branchLabel,(height+childHeight)/2, childPos, TikzRenderingHints.VALUE_SOUTH, 9.0, g);
+            drawNode(branchLabel, (height + childHeight) / 2, childPos, TikzRenderingHints.VALUE_SOUTH, 9.0, g);
         }
 
         //g.draw(new Line2D.Double(childHeight, childPos, height, childPos));
@@ -83,7 +84,8 @@ public class SquareTreeComponent extends TreeComponent {
 
         double labelOffset = 5;
 
-        TreeComponent treeComponent = new SquareTreeComponent(new TreeParser(newickTree), labelOffset, false);
+        TreeComponent treeComponent =
+                new SquareTreeComponent(Arrays.asList(new Tree[]{new TreeParser(newickTree)}), labelOffset, false);
 
         JFrame frame = new JFrame("SquareTreeComponent");
         frame.getContentPane().add(treeComponent, BorderLayout.CENTER);

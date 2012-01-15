@@ -6,11 +6,11 @@ import beast.core.Runnable;
 import beast.evolution.tree.Tree;
 import org.jtikz.TikzGraphics2D;
 
-import java.awt.*;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Alexei Drummond
@@ -18,15 +18,17 @@ import java.io.PrintStream;
 @Description("Generates the tree figure from input tree into Tikz/PGF format for addition to LaTeX document.")
 public class TikzTree extends Runnable {
 
-    public Input<Tree> tree = new Input<Tree>("tree", "phylogenetic tree with taxa data in the leafs", Input.Validate.REQUIRED);
+    public Input<List<Tree>> tree = new Input<List<Tree>>("tree", "phylogenetic tree with taxa data in the leafs", new ArrayList<Tree>());
     public Input<Double> lineThickness = new Input<Double>("lineThickness", "indicates the thickness of the lines", 1.0);
     public Input<Double> labelOffset = new Input<Double>("labelOffset", "indicates the distance from leaf node to its label in pts", 5.0);
-    public Input<Integer> width = new Input<Integer>("width", "the width of the figure in pts", 100);
-    public Input<Integer> height = new Input<Integer>("height", "the height of the figure in pts", 100);
+    public Input<Integer> width = new Input<Integer>("width", "the width of the figure in pts", 150);
+    public Input<Integer> height = new Input<Integer>("height", "the height of the figure in pts", 150);
     public Input<String> fileName = new Input<String>("fileName", "the name of the file to write Tikz code to", "");
     public Input<Boolean> showLeafLabels = new Input<Boolean>("showLeafLabels", "if true then the taxa labels are displayed", true);
     public Input<String> branchLabels = new Input<String>("branchLabels", "the attribute name of values to display on the branches, or empty string if no branch labels to be displayed", "");
     public Input<Boolean> showInternodeIntervals = new Input<Boolean>("showInternodeIntervals", "if true then dotted lines at each internal node height are displayed", true);
+    public Input<Integer> strideLength = new Input<Integer>("strideLength", "The number of trees to display in a 'stride' before wrapping to the next stride", 2);
+    public Input<Boolean> isHorizontalStride = new Input<Boolean>("isHorizontalStride", "if true then strides are displayed horizontally, else vertically", true);
     public Input<String> pdflatexPath = new Input<String>("pdflatexPath", "the path to pdflatex; if provided then will be run automatically", "");
 
     public void initAndValidate() {
@@ -35,22 +37,23 @@ public class TikzTree extends Runnable {
     public void run() throws IOException, InterruptedException {
         TreeComponent treeComponent = new SquareTreeComponent(tree.get(), labelOffset.get(), showInternodeIntervals.get());
         treeComponent.setLineThickness(lineThickness.get());
-        treeComponent.setSize(new Dimension(width.get(), height.get()));
+        treeComponent.setTreeWidth(width.get());
+        treeComponent.setTreeHeight(height.get());
         treeComponent.setShowLeafLabels(showLeafLabels.get());
         treeComponent.setBranchLabelAttribute(branchLabels.get());
+        treeComponent.strideLength = strideLength.get();
 
         String fileName = this.fileName.get();
         TikzGraphics2D tikzGraphics2D;
 
         PrintStream out = System.out;
 
-
-        //if (fileName != "") {
-        out = new PrintStream(new FileOutputStream(fileName));
+        if (!fileName.equals("")) {
+            out = new PrintStream(new FileOutputStream(fileName));
+        }
         out.println("\\documentclass[12pt]{article}");
         out.println("\\usepackage{tikz,pgf}");
         out.println("\\begin{document}");
-        // }
 
         tikzGraphics2D = new TikzGraphics2D(out);
         treeComponent.paint(tikzGraphics2D);
@@ -59,14 +62,12 @@ public class TikzTree extends Runnable {
         out.println("\\end{document}");
         out.flush();
         if (out != System.out) {
-            
-            
             out.close();
-            
+
             String pdflatexPathString = pdflatexPath.get();
             if (!pdflatexPathString.equals("")) {
-                String pdfFileName = fileName.substring(0,fileName.length()-3) + "pdf";
-            
+                String pdfFileName = fileName.substring(0, fileName.length() - 3) + "pdf";
+
                 Process p = Runtime.getRuntime().exec(pdflatexPathString + " " + fileName);
                 p.waitFor();
                 Process p2 = Runtime.getRuntime().exec("open " + pdfFileName);

@@ -4,6 +4,7 @@ import beast.evolution.tree.Node;
 import beast.evolution.tree.Tree;
 
 import java.awt.*;
+import java.util.List;
 
 /**
  * @author Alexei Drummond
@@ -12,19 +13,19 @@ public class VerticalTreeComponent extends TreeComponent {
 
     boolean showLabels = true;
 
-    public VerticalTreeComponent(Tree tree,
+    public VerticalTreeComponent(List<Tree> trees,
                                  double offset, boolean showLabels) {
 
-        super(tree, 0, 0, offset, true, false);
+        super(trees, 0, 0, offset, true, false);
 
         this.showLabels = showLabels;
     }
 
 
-    public VerticalTreeComponent(Tree tree, double nodeHeightScale, double nodeSpacingScale,
+    public VerticalTreeComponent(List<Tree> trees, double nodeHeightScale, double nodeSpacingScale,
                                  double offset, boolean showLabels) {
 
-        super(tree, nodeHeightScale, nodeSpacingScale, offset, true, false);
+        super(trees, nodeHeightScale, nodeSpacingScale, offset, true, false);
 
         this.showLabels = showLabels;
     }
@@ -44,8 +45,8 @@ public class VerticalTreeComponent extends TreeComponent {
     @Override
     void drawBranch(Tree tree, Node node, Node childNode, Graphics2D g) {
 
-        double height = getScaledOffsetNodeHeight(node);
-        double childHeight = getScaledOffsetNodeHeight(childNode);
+        double height = getScaledOffsetNodeHeight(tree, node.getHeight());
+        double childHeight = getScaledOffsetNodeHeight(tree, childNode.getHeight());
 
         double position = getNodePosition(node);
         double childPosition = getNodePosition(childNode);
@@ -57,7 +58,7 @@ public class VerticalTreeComponent extends TreeComponent {
     void drawLabel(Tree tree, Node node, Graphics2D g) {
 
         if (showLabels) {
-            label(getNodePosition(node), getScaledOffsetNodeHeight(node) + labelOffset, node.getID(), g);
+            label(getNodePosition(node), getScaledOffsetNodeHeight(tree, node.getHeight()) + labelOffset, node.getID(), g);
         }
     }
 
