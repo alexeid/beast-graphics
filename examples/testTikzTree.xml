@@ -28,6 +28,6 @@
         </populationModel>
     </tree>
 
-    <run spec='beast.app.draw.tree.TikzTree' fileName="testTikzTree.tex" width="100" height="100" showLabels="true"
+    <run spec='beast.app.draw.tree.TikzTree' fileName="testTikzTree.tex" width="100" height="100" showLeafLabels="true"
          lineThickness="1.25" showInternodeIntervals="true" pdflatexPath="/usr/texbin/pdflatex" tree="@tree"/>
 </beast>
