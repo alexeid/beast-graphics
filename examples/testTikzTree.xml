@@ -1,28 +1,15 @@
 <beast version='2.0'
-       namespace='beast.core:beast.evolution.tree.coalescent:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood'>
+       namespace='beast.core:beast.evolution.alignment:beast.evolution.tree.coalescent:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood'>
 
-    <data id="alignment" dataType="nucleotide">
-        <sequence taxon="A">
-            A
-        </sequence>
-        <sequence taxon="B">
-            A
-        </sequence>
-        <sequence taxon="C">
-            A
-        </sequence>
-        <sequence taxon="D">
-            A
-        </sequence>
-        <sequence taxon="E">
-            A
-        </sequence>
-        <sequence taxon="F">
-            A
-        </sequence>
-    </data>
-
-    <tree spec='beast.evolution.tree.RandomTree' id='tree' taxa='@alignment'>
+    <tree spec='beast.evolution.tree.RandomTree' id='tree'>
+        <taxonset spec='TaxonSet' id='taxonset'>
+            <taxon spec='Taxon' id='A'/>
+            <taxon spec='Taxon' id='B'/>
+            <taxon spec='Taxon' id='C'/>
+            <taxon spec='Taxon' id='D'/>
+            <taxon spec='Taxon' id='E'/>
+            <taxon spec='Taxon' id='F'/>
+        </taxonset>
         <populationModel spec='ConstantPopulation'>
             <popSize spec='parameter.RealParameter' value='1'/>
         </populationModel>
