@@ -3,7 +3,6 @@ package beast.app.draw.tree;
 import beast.core.Description;
 import beast.core.Input;
 import beast.core.Runnable;
-import beast.evolution.tree.Tree;
 import org.jtikz.TikzGraphics2D;
 
 import java.io.FileOutputStream;
@@ -15,33 +14,26 @@ import java.util.List;
 /**
  * @author Alexei Drummond
  */
-@Description("Generates the tree figure from input tree into Tikz/PGF format for addition to LaTeX document.")
-public class TikzTree extends Runnable {
+@Description("Generates the tree figure in grid format, from input trees into Tikz/PGF format for addition to LaTeX document.")
+public class TikzTreeFigure extends Runnable {
 
-    public Input<List<Tree>> tree = new Input<List<Tree>>("tree", "phylogenetic tree with taxa data in the leafs", new ArrayList<Tree>());
-    public Input<Double> lineThickness = new Input<Double>("lineThickness", "indicates the thickness of the lines", 1.0);
-    public Input<Double> labelOffset = new Input<Double>("labelOffset", "indicates the distance from leaf node to its label in pts", 5.0);
-    public Input<Integer> width = new Input<Integer>("width", "the width of the figure in pts", 150);
-    public Input<Integer> height = new Input<Integer>("height", "the height of the figure in pts", 150);
-    public Input<String> fileName = new Input<String>("fileName", "the name of the file to write Tikz code to", "");
-    public Input<Boolean> showLeafLabels = new Input<Boolean>("showLeafLabels", "if true then the taxa labels are displayed", true);
-    public Input<String> branchLabels = new Input<String>("branchLabels", "the attribute name of values to display on the branches, or empty string if no branch labels to be displayed", "");
-    public Input<Boolean> showInternodeIntervals = new Input<Boolean>("showInternodeIntervals", "if true then dotted lines at each internal node height are displayed", true);
+    public Input<List<TreeDrawing>> treeDrawing = new Input<List<TreeDrawing>>("treeDrawing", "a tree drawing", new ArrayList<TreeDrawing>());
     public Input<Integer> strideLength = new Input<Integer>("strideLength", "The number of trees to display in a 'stride' before wrapping to the next stride", 2);
     public Input<Boolean> isHorizontalStride = new Input<Boolean>("isHorizontalStride", "if true then strides are displayed horizontally, else vertically", true);
+    public Input<Integer> width = new Input<Integer>("width", "the width of a grid cell in the figure", 150);
+    public Input<Integer> height = new Input<Integer>("height", "the height of a grid cell in the figure", 150);
+    public Input<String> fileName = new Input<String>("fileName", "the name of the file to write Tikz code to", "");
     public Input<String> pdflatexPath = new Input<String>("pdflatexPath", "the path to pdflatex; if provided then will be run automatically", "");
 
     public void initAndValidate() {
     }
 
     public void run() throws IOException, InterruptedException {
-        TreeComponent treeComponent = new SquareTreeComponent(tree.get(), labelOffset.get(), showInternodeIntervals.get());
-        treeComponent.setLineThickness(lineThickness.get());
+        TreeComponent treeComponent = new SquareTreeComponent(treeDrawing.get());
         treeComponent.setTreeWidth(width.get());
         treeComponent.setTreeHeight(height.get());
-        treeComponent.setShowLeafLabels(showLeafLabels.get());
-        treeComponent.setBranchLabelAttribute(branchLabels.get());
         treeComponent.strideLength = strideLength.get();
+        treeComponent.isHorizontalStride = isHorizontalStride.get();
 
         String fileName = this.fileName.get();
         TikzGraphics2D tikzGraphics2D;

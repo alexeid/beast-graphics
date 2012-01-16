@@ -18,17 +18,14 @@ import java.util.List;
 public class SquareTreeComponent extends TreeComponent {
 
 
-    public SquareTreeComponent(List<Tree> trees, double labelOffset, boolean showInternodeIntervals) {
+    public SquareTreeComponent(List<TreeDrawing> treeDrawings) {
 
-        super(trees, labelOffset, false);
-        setShowInternodeIntervals(showInternodeIntervals);
+        super(treeDrawings, false);
     }
 
-    public SquareTreeComponent(List<Tree> trees, double nodeHeightScale, double nodeSpacing,
-                               double labelOffset,
-                               boolean showInternodeIntervals) {
+    public SquareTreeComponent(List<TreeDrawing> treeDrawings, double nodeHeightScale, double nodeSpacing) {
 
-        super(trees, nodeHeightScale, nodeSpacing, labelOffset, false, showInternodeIntervals);
+        super(treeDrawings, nodeHeightScale, nodeSpacing, false);
     }
 
     void drawBranch(Tree tree, Node node, Node childNode, Graphics2D g) {
@@ -39,53 +36,28 @@ public class SquareTreeComponent extends TreeComponent {
         double pos = getNodePosition(node);
         double childPos = getNodePosition(childNode);
 
-
         Path2D path = new GeneralPath();
         path.moveTo(childHeight, childPos);
         path.lineTo(height, childPos);
         path.lineTo(height, pos);
 
         g.draw(path);
+    }
 
-        if (branchLabels != null && !branchLabels.equals("")) {
+    void drawBranchLabel(String branchLabel, Tree tree, Node node, Node childNode, Object anchor, double fontSize, Graphics2D g) {
+        double height = getScaledOffsetNodeHeight(tree, node.getHeight());
+        double childHeight = getScaledOffsetNodeHeight(tree, childNode.getHeight());
+        double childPos = getNodePosition(childNode);
 
-            Object metaData = childNode.getMetaData(branchLabels);
-            String branchLabel;
-            if (metaData instanceof Number) {
-                branchLabel = format.format(metaData);
-            } else {
-                branchLabel = metaData.toString();
-            }
-            drawNode(branchLabel, (height + childHeight) / 2, childPos, TikzRenderingHints.VALUE_SOUTH, 9.0, g);
-        }
-
-        //g.draw(new Line2D.Double(childHeight, childPos, height, childPos));
-        //g.draw(new Line2D.Double(childHeight, childPos, height, childPos));
-
-//        builder.append("\\draw (");
-//        builder.append(childHeight);
-//        builder.append(", ");
-//        builder.append(childNode.getAttribute("y"));
-//        builder.append(") -- (");
-//        builder.append(height);
-//        builder.append(", ");
-//        builder.append(childNode.getAttribute("y"));
-//        builder.append(") -- (");
-//        builder.append(height);
-//        builder.append(", ");
-//        builder.append(node.getAttribute("y"));
-//        builder.append(");\n");
-
+        drawNode(branchLabel, (height + childHeight) / 2, childPos, TikzRenderingHints.VALUE_SOUTH, 9.0, g);
     }
 
     public static void main(String[] args) throws Exception {
 
         String newickTree = "((((1:0.1,2:0.1):0.1,3:0.2):0.1,4:0.3):0.1,5:0.4);";
 
-        double labelOffset = 5;
-
         TreeComponent treeComponent =
-                new SquareTreeComponent(Arrays.asList(new Tree[]{new TreeParser(newickTree)}), labelOffset, false);
+                new SquareTreeComponent(Arrays.asList(new TreeDrawing(new TreeParser(newickTree))));
 
         JFrame frame = new JFrame("SquareTreeComponent");
         frame.getContentPane().add(treeComponent, BorderLayout.CENTER);

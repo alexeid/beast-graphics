@@ -2,6 +2,7 @@ package beast.app.draw.tree;
 
 import beast.evolution.tree.Node;
 import beast.evolution.tree.Tree;
+import org.jtikz.TikzRenderingHints;
 
 import java.awt.*;
 import java.util.List;
@@ -11,23 +12,15 @@ import java.util.List;
  */
 public class VerticalTreeComponent extends TreeComponent {
 
-    boolean showLabels = true;
+    public VerticalTreeComponent(List<TreeDrawing> treeDrawings) {
 
-    public VerticalTreeComponent(List<Tree> trees,
-                                 double offset, boolean showLabels) {
-
-        super(trees, 0, 0, offset, true, false);
-
-        this.showLabels = showLabels;
+        super(treeDrawings, 0, 0, true);
     }
 
 
-    public VerticalTreeComponent(List<Tree> trees, double nodeHeightScale, double nodeSpacingScale,
-                                 double offset, boolean showLabels) {
+    public VerticalTreeComponent(List<TreeDrawing> treeDrawings, double nodeHeightScale, double nodeSpacingScale) {
 
-        super(trees, nodeHeightScale, nodeSpacingScale, offset, true, false);
-
-        this.showLabels = showLabels;
+        super(treeDrawings, nodeHeightScale, nodeSpacingScale, true);
     }
 
     @Override
@@ -55,11 +48,13 @@ public class VerticalTreeComponent extends TreeComponent {
     }
 
     @Override
-    void drawLabel(Tree tree, Node node, Graphics2D g) {
+    void drawBranchLabel(String branchLabel, Tree tree, Node node, Node childNode, Object anchor, double fontSize, Graphics2D g) {
+        double height = getScaledOffsetNodeHeight(tree, node.getHeight());
+        double childHeight = getScaledOffsetNodeHeight(tree, childNode.getHeight());
+        double pos = getNodePosition(node);
+        double childPos = getNodePosition(childNode);
 
-        if (showLabels) {
-            label(getNodePosition(node), getScaledOffsetNodeHeight(tree, node.getHeight()) + labelOffset, node.getID(), g);
-        }
+        drawNode(branchLabel, (pos + childPos) / 2, (height + childHeight) / 2, TikzRenderingHints.VALUE_SOUTH, 9.0, g);
     }
 
     @Override

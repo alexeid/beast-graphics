@@ -1,24 +1,50 @@
 <beast version='2.0'
        namespace='beast.core:beast.evolution.alignment:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood'>
 
+    <taxonset spec='TaxonSet' id='taxonset'>
+        <taxon spec='Taxon' id='A'/>
+        <taxon spec='Taxon' id='B'/>
+        <taxon spec='Taxon' id='C'/>
+        <taxon spec='Taxon' id='D'/>
+    </taxonset>
+
+
     <tree spec='beast.util.TreeParser' id='tree'>
-        <taxonset spec='TaxonSet' id='taxonset'>
-            <taxon spec='Taxon' id='A'/>
-            <taxon spec='Taxon' id='B'/>
-            <taxon spec='Taxon' id='C'/>
-            <taxon spec='Taxon' id='D'/>
-            <taxon spec='Taxon' id='E'/>
-            <taxon spec='Taxon' id='F'/>
-        </taxonset>
+        <taxonset idref='taxonset'/>
         <input name='newick'>
             <![CDATA[
-            ((5:[&rate=$r_2$]0.04847887618847128,(3:[&rate=$r_3$]0.03189934232093919,((2:[&rate=$r_{5}$]0.011076861832266626,1:[&rate=$r_6$]0.011076861832266626):[&rate=$r_{7}$]0.009810542752873795,4:[&rate=$r_4$]0.02088740458514042):[&rate=$r_8$]0.011011937735798769):[&rate=$r_9$]0.01657953386753209):[&rate=$r_{10}$]0.017232517763959114,6:[&rate=$r_{1}$]0.06571139395243039);
+            (D:[&rate=0.02]3,((B:[&rate=0.02]1,A:[&rate=0.03]1):[&rate=0.02]1,C:[&rate=0.01]2):[&rate=0.01]1);
             ]]>
         </input>
     </tree>
 
-    <run spec='beast.app.draw.tree.TikzTree' fileName="testTikzTree2.tex" width="300" height="300" showLeafLabels="true"
-         lineThickness="1.25" labelOffset="10" showInternodeIntervals="true" branchLabels="&amp;rate"
-         pdflatexPath="/usr/texbin/pdflatex" tree="@tree"/>
+    <tree spec='beast.util.TreeParser' id='tree2'>
+        <taxonset spec='TaxonSet' id='taxonset2'>
+            <taxon idref='A'/>
+            <taxon idref='B'/>
+            <taxon idref='C'/>
+            <taxon idref='D'/>
+        </taxonset>
+        <input name='newick'>
+            <![CDATA[
+            ((A:[&rate=0.03]3,B:2):1,(C:1,D:7):1);
+            ]]>
+            <!--(((A:0.3,B:0.2):0.2,C:0.2):0.2,D:0.8); -->
+        </input>
+    </tree>
+
+    <run spec='beast.app.draw.tree.TikzTreeGrid' fileName="testTikzTree2.tex" width="200" height="200" oneScale="true"
+         pdflatexPath="/usr/texbin/pdflatex">
+
+        <treeDrawing spec='beast.app.draw.tree.TreeDrawing' showLeafLabels="true"
+                     lineThickness="1.25" labelOffset="10" showInternodeIntervals="true" branchLabels="&amp;rate">
+            <tree idref="tree"/>
+        </treeDrawing>
+        <treeDrawing spec='beast.app.draw.tree.UnrootedTreeDrawing' showLeafLabels="true"
+                     lineThickness="1.25" labelOffset="10" showInternodeIntervals="true" branchLabels="&amp;rate"
+                     theta="0">
+            <tree idref="tree2"/>
+        </treeDrawing>
+    </run>
 </beast>
 

@@ -13,7 +13,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Line2D;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -21,7 +22,7 @@ import java.util.List;
  */
 public class TreeComponent extends JComponent {
 
-    List<Tree> trees;
+    List<TreeDrawing> treeDrawings;
     int strideLength = 2;
     boolean isHorizontalStride = true;
 
@@ -33,22 +34,12 @@ public class TreeComponent extends JComponent {
     // the position of the "current" leaf node
     private double p = 0;
 
-    // offset of leaf node labels from leaf node position
-    double labelOffset;
-
     //String newick;
     //String options = "ultra thick";
     //ScaleBar scalebar;
     NumberFormat format = NumberFormat.getInstance();
 
     boolean isTriangle = true;
-
-    private boolean showInternodeIntervals = false;
-    private Map<Tree, TreeIntervals> internodeIntervals = null;
-
-    private Boolean showLeafLabels = true;
-
-    String branchLabels = "";
 
     double treeHeight = 100;
     double treeWidth = 100;
@@ -63,58 +54,50 @@ public class TreeComponent extends JComponent {
      */
     double ns = 0;
 
-    double lineThickness = 1.0;
-
-
     /**
-     * @param trees       the list of trees to draw
-     * @param labelOffset the pixel labelOffset of labels from leaf nodes
+     * @param treeDrawing a tree drawing
      * @param isTriangle  true if tree should be drawn so that outside branches form a triangle on ultrametric trees
      */
-    public TreeComponent(List<Tree> trees, double labelOffset, boolean isTriangle) {
+    public TreeComponent(TreeDrawing treeDrawing, boolean isTriangle) {
 
-        this(trees, 0, 0, labelOffset, isTriangle, false);
+        this(Arrays.asList(treeDrawing), 0, 0, isTriangle);
 
     }
 
-    public TreeComponent(List<Tree> trees, double nodeHeightScale, double nodeSpacing, double labelOffset, boolean isTriangle, boolean showInternodeIntervals) {
+
+    /**
+     * @param treeDrawings the list of tree drawings
+     * @param isTriangle   true if tree should be drawn so that outside branches form a triangle on ultrametric trees
+     */
+    public TreeComponent(List<TreeDrawing> treeDrawings, boolean isTriangle) {
+
+        this(treeDrawings, 0, 0, isTriangle);
+
+    }
+
+    public TreeComponent(List<TreeDrawing> treeDrawings, double nodeHeightScale, double nodeSpacing, boolean isTriangle) {
 
         format.setMaximumFractionDigits(5);
 
         //this.scalebar = scalebar;
         this.isTriangle = isTriangle;
-        setShowInternodeIntervals(showInternodeIntervals);
 
-        this.labelOffset = labelOffset;
         this.nhs = nodeHeightScale;
         this.ns = nodeSpacing;
 
-        this.trees = new ArrayList<Tree>();
-        this.trees.addAll(trees);
+        this.treeDrawings = new ArrayList<TreeDrawing>();
+        this.treeDrawings.addAll(treeDrawings);
 
         maxRootHeight = 0;
-        for (Tree tree : trees) {
+        for (TreeDrawing treeDrawing : treeDrawings) {
+
+            Tree tree = treeDrawing.getTree();
             if (tree.getRoot().getHeight() > maxRootHeight) {
                 maxRootHeight = tree.getRoot().getHeight();
             }
         }
 
         setSize(calculateComponentWidth(), calculateComponentHeight());
-    }
-
-    void setShowInternodeIntervals(boolean showInternodeIntervals) {
-
-        this.showInternodeIntervals = showInternodeIntervals;
-        if (showInternodeIntervals && internodeIntervals == null) {
-            internodeIntervals = new HashMap<Tree, TreeIntervals>();
-            for (Tree tree : trees) {
-                try {
-                    internodeIntervals.put(tree, new TreeIntervals(tree));
-                } catch (Exception e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
-            }
-        }
     }
 
 //    public void addTree(Tree tree) {
@@ -165,7 +148,10 @@ public class TreeComponent extends JComponent {
     }
 
     private double calculateStrideCount() {
-        return trees.size() / strideLength + (trees.size() % strideLength == 0 ? 0 : 1);
+
+        int treeCount = treeDrawings.size();
+
+        return treeCount / strideLength + (treeCount % strideLength == 0 ? 0 : 1);
     }
 
     /**
@@ -285,6 +271,10 @@ public class TreeComponent extends JComponent {
         g.setFont(oldFont);
     }
 
+    private boolean isDrawingBranchLabels(TreeDrawing treeDrawing) {
+        return treeDrawing.getBranchLabels() != null && !treeDrawing.getBranchLabels().equals("");
+    }
+
     void drawBranch(Tree tree, Node node, Node childNode, Graphics2D g) {
 
         double height = getScaledOffsetNodeHeight(tree, node.getHeight());
@@ -293,34 +283,37 @@ public class TreeComponent extends JComponent {
         double position = getNodePosition(node);
         double childPosition = getNodePosition(childNode);
 
-        if (branchLabels != null && !branchLabels.equals("")) {
-            Object metaData = childNode.getMetaData(branchLabels);
-            String branchLabel;
-            if (metaData instanceof Number) {
-                branchLabel = format.format(metaData);
-            } else {
-                branchLabel = metaData.toString();
-            }
-            drawNode(branchLabel, (height + childHeight) / 2, (position + childPosition) / 2, TikzRenderingHints.VALUE_SOUTH, 9.0, g);
-        }
         draw(height, position, childHeight, childPosition, g);
     }
 
-    void drawLabel(Tree tree, Node node, Graphics2D g) {
+    void drawBranchLabel(String label, Tree tree, Node node, Node childNode, Object anchor, double fontSize, Graphics2D g) {
 
         double height = getScaledOffsetNodeHeight(tree, node.getHeight());
-        double position = getNodePosition(node);
+        double childHeight = getScaledOffsetNodeHeight(tree, childNode.getHeight());
 
-        label(height + labelOffset, position, node.getID(), g);
+        double position = getNodePosition(node);
+        double childPosition = getNodePosition(childNode);
+
+        drawNode(label, (height + childHeight) / 2, (position + childPosition) / 2, anchor, fontSize, g);
     }
 
-    void draw(Tree tree, Node node, Graphics2D g) {
+    void drawLabel(TreeDrawing treeDrawing, Node node, Graphics2D g) {
 
-        if (showInternodeIntervals && node.isRoot()) {
-            drawInternodeIntervals(internodeIntervals.get(tree), g);
+        double height = getScaledOffsetNodeHeight(treeDrawing.getTree(), node.getHeight());
+        double position = getNodePosition(node);
+
+        label(height + treeDrawing.getLabelOffset(), position, node.getID(), g);
+    }
+
+    void draw(TreeDrawing treeDrawing, Node node, Graphics2D g) {
+
+        Tree tree = treeDrawing.getTree();
+
+        if (treeDrawing.showInternodeIntervals() && node.isRoot()) {
+            drawInternodeIntervals(treeDrawing.getTreeIntervals(), g);
         }
 
-        g.setStroke(new BasicStroke((float) lineThickness));
+        g.setStroke(new BasicStroke((float) treeDrawing.getLineThickness()));
 
         p = firstLeafNodePosition(tree);
 
@@ -328,8 +321,8 @@ public class TreeComponent extends JComponent {
             setTipValues(tree, node);
         }
 
-        if (node.isLeaf() && showLeafLabels) {
-            drawLabel(tree, node, g);
+        if (node.isLeaf() && treeDrawing.showLeafNodes()) {
+            drawLabel(treeDrawing, node, g);
         } else {
 
             double cp = 0;
@@ -364,7 +357,7 @@ public class TreeComponent extends JComponent {
 
             int count = 0;
             for (Node childNode : node.getChildren()) {
-                draw(tree, childNode, g);
+                draw(treeDrawing, childNode, g);
                 cp += (Double) childNode.getMetaData("p");
                 count += 1;
             }
@@ -374,6 +367,16 @@ public class TreeComponent extends JComponent {
             for (Node childNode : node.getChildren()) {
 
                 drawBranch(tree, node, childNode, g);
+                if (isDrawingBranchLabels(treeDrawing)) {
+                    Object metaData = childNode.getMetaData(treeDrawing.getBranchLabels());
+                    String branchLabel;
+                    if (metaData instanceof Number) {
+                        branchLabel = format.format(metaData);
+                    } else {
+                        branchLabel = metaData.toString();
+                    }
+                    drawBranchLabel(branchLabel, tree, node, childNode, TikzRenderingHints.VALUE_SOUTH, 9.0, g);
+                }
             }
         }
     }
@@ -383,7 +386,6 @@ public class TreeComponent extends JComponent {
         Tree tree = treeIntervals.m_tree.get();
         Stroke s = g.getStroke();
         g.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10, new float[]{1.0f, 1.0f}, 0));
-
 
         double[] intervals = treeIntervals.getIntervals(null);
 
@@ -417,13 +419,11 @@ public class TreeComponent extends JComponent {
         //double x = 0;
         //double y = 0;
 
-        System.out.println("Drawing " + trees.size() + " trees");
+        for (TreeDrawing treeDrawing : treeDrawings) {
 
-        for (Tree tree : trees) {
+            Tree tree = treeDrawing.getTree();
 
-            System.out.println("Drawing tree " + tree);
-
-            draw(tree, tree.getRoot(), g2d);
+            draw(treeDrawing, tree.getRoot(), g2d);
             count += 1;
             if (count % strideLength == 0) {
                 // next stride
@@ -457,7 +457,8 @@ public class TreeComponent extends JComponent {
 
         double labelOffset = 5;
 
-        TreeComponent treeComponent = new SquareTreeComponent(Arrays.asList(new Tree[]{new TreeParser(alignment, newickTree)}), labelOffset, false);
+        TreeComponent treeComponent = new SquareTreeComponent(Arrays.asList(new TreeDrawing[]{
+                new TreeDrawing(new TreeParser(alignment, newickTree))}));
 
         TikzGraphics2D tikzGraphics2D = new TikzGraphics2D();
         treeComponent.setSize(new Dimension(100, 100));
@@ -473,16 +474,8 @@ public class TreeComponent extends JComponent {
 //        frame.setVisible(true);
     }
 
-    public void setLineThickness(double lineThickness) {
-        this.lineThickness = lineThickness;
-    }
-
-    public void setBranchLabelAttribute(String branchLabels) {
-        this.branchLabels = branchLabels;
-    }
-
-    public void setShowLeafLabels(Boolean showLeafLabels) {
-        this.showLeafLabels = showLeafLabels;
+    public void setTreeHeightScaleFactor(double scaleFactor) {
+        nhs = scaleFactor;
     }
 }
 
