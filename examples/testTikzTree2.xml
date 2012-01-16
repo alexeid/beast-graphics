@@ -13,7 +13,7 @@
         <taxonset idref='taxonset'/>
         <input name='newick'>
             <![CDATA[
-            (D:[&rate=0.02]3,((B:[&rate=0.02]1,A:[&rate=0.03]1):[&rate=0.02]1,C:[&rate=0.01]2):[&rate=0.01]1);
+            (D:[&rate=$1\times4.5$Myr]4.5,((B:[&rate=$1\times1$Myr]1,A:[&rate=$1.5\times1$Myr]1):[&rate=$1\times2$Myr]2,C:[&rate=$0.5\times3$Myr]3):[&rate=$0.5\times1.5$Myr]1.5);
             ]]>
         </input>
     </tree>
@@ -27,24 +27,28 @@
         </taxonset>
         <input name='newick'>
             <![CDATA[
-            ((A:[&rate=0.03]3,B:2):1,(C:1,D:7):1);
+            ((A:1.5,B:1):1,(C:1.5,D:5.25):1);
             ]]>
             <!--(((A:0.3,B:0.2):0.2,C:0.2):0.2,D:0.8); -->
         </input>
     </tree>
 
-    <run spec='beast.app.draw.tree.TikzTreeGrid' fileName="testTikzTree2.tex" width="200" height="200" oneScale="true"
-         pdflatexPath="/usr/texbin/pdflatex">
+    <run spec='beast.app.draw.tree.TikzTreeGrid' fileName="testTikzTree2.tex" width="180" height="150" oneScale="true"
+         isHorizontalStride="false" pdflatexPath="/usr/texbin/pdflatex">
 
         <treeDrawing spec='beast.app.draw.tree.TreeDrawing' showLeafLabels="true"
                      lineThickness="1.25" labelOffset="10" showInternodeIntervals="true" branchLabels="&amp;rate">
             <tree idref="tree"/>
         </treeDrawing>
-        <treeDrawing spec='beast.app.draw.tree.UnrootedTreeDrawing' showLeafLabels="true"
-                     lineThickness="1.25" labelOffset="10" showInternodeIntervals="true" branchLabels="&amp;rate"
-                     theta="0">
+        <treeDrawing spec='beast.app.draw.tree.TreeDrawing' showLeafLabels="true"
+                     lineThickness="1.25" labelOffset="10" showInternodeIntervals="false">
             <tree idref="tree2"/>
         </treeDrawing>
+        <treeDrawing spec='beast.app.draw.tree.UnrootedTreeDrawing' showLeafLabels="true"
+                     lineThickness="1.25" labelOffset="10">
+            <tree idref="tree2"/>
+        </treeDrawing>
+
     </run>
 </beast>
 
