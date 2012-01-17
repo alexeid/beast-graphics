@@ -13,7 +13,7 @@
         <taxonset idref='taxonset'/>
         <input name='newick'>
             <![CDATA[
-            (D:[&rate=$1\times4.5$Myr]4.5,((B:[&rate=$1\times1$Myr]1,A:[&rate=$1.5\times1$Myr]1):[&rate=$1\times2$Myr]2,C:[&rate=$0.5\times3$Myr]3):[&rate=$0.5\times1.5$Myr]1.5);
+            (D:[&rate=1]4.5,((B:[&rate=1]1,A:[&rate=1.5]1):[&rate=1]2,C:[&rate=0.5]3):[&rate=0.5]1.5);
             ]]>
         </input>
     </tree>
@@ -37,7 +37,7 @@
          isHorizontalStride="false" pdflatexPath="/usr/texbin/pdflatex">
 
         <treeDrawing spec='beast.app.draw.tree.TreeDrawing' showLeafLabels="true"
-                     lineThickness="1.25" labelOffset="10" showInternodeIntervals="true" branchLabels="&amp;rate">
+                     lineThickness="1.25" labelOffset="10" showInternodeIntervals="true" branchLabels="&amp;rate" style="vertical">
             <tree idref="tree"/>
         </treeDrawing>
         <treeDrawing spec='beast.app.draw.tree.TreeDrawing' showLeafLabels="true"

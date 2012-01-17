@@ -18,14 +18,14 @@ import java.util.List;
 public class SquareTreeComponent extends TreeComponent {
 
 
-    public SquareTreeComponent(List<TreeDrawing> treeDrawings) {
+    public SquareTreeComponent(TreeDrawing treeDrawing) {
 
-        super(treeDrawings, false);
+        super(treeDrawing, false);
     }
 
-    public SquareTreeComponent(List<TreeDrawing> treeDrawings, double nodeHeightScale, double nodeSpacing) {
+    public SquareTreeComponent(TreeDrawing treeDrawing, double nodeHeightScale, double nodeSpacing) {
 
-        super(treeDrawings, nodeHeightScale, nodeSpacing, false);
+        super(treeDrawing, nodeHeightScale, nodeSpacing, false);
     }
 
     void drawBranch(Tree tree, Node node, Node childNode, Graphics2D g) {
@@ -57,7 +57,7 @@ public class SquareTreeComponent extends TreeComponent {
         String newickTree = "((((1:0.1,2:0.1):0.1,3:0.2):0.1,4:0.3):0.1,5:0.4);";
 
         TreeComponent treeComponent =
-                new SquareTreeComponent(Arrays.asList(new TreeDrawing(new TreeParser(newickTree))));
+                new SquareTreeComponent(new TreeDrawing(new TreeParser(newickTree)));
 
         JFrame frame = new JFrame("SquareTreeComponent");
         frame.getContentPane().add(treeComponent, BorderLayout.CENTER);

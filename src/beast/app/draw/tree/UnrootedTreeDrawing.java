@@ -13,7 +13,7 @@ public class UnrootedTreeDrawing extends TreeDrawing {
 
     public void initAndValidate() throws Exception {
         super.initAndValidate();
-        treeComponent = new UnrootedTreeComponent(Arrays.asList((TreeDrawing) this));
+        treeComponent = new UnrootedTreeComponent(this);
         ((UnrootedTreeComponent) treeComponent).setTheta(thetaInput.get());
     }
 

@@ -13,8 +13,8 @@ public class UnrootedTreeComponent extends TreeComponent {
 
     double startingTheta = 0.0;
 
-    public UnrootedTreeComponent(java.util.List<TreeDrawing> treeDrawings) {
-        super(treeDrawings, false);
+    public UnrootedTreeComponent(TreeDrawing treeDrawing) {
+        super(treeDrawing, false);
     }
 
     public void setTheta(double theta) {
@@ -54,8 +54,8 @@ public class UnrootedTreeComponent extends TreeComponent {
         if (node.isRoot()) {
             fullAngle = 2 * Math.PI;
 
-            node.setMetaData("x1", treeWidth / 2);
-            node.setMetaData("y1", treeHeight / 2);
+            node.setMetaData("x1", (double)getWidth() / 2.0);
+            node.setMetaData("y1", (double)getHeight() / 2.0);
 
         } else {
 

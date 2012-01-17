@@ -49,13 +49,13 @@ public class TreeDrawing extends Plugin {
                 treeComponent = new TreeComponent(this, true);
                 break;
             case square:
-                treeComponent = new SquareTreeComponent(Arrays.asList(this));
+                treeComponent = new SquareTreeComponent(this);
                 break;
             case vertical:
-                treeComponent = new VerticalTreeComponent(Arrays.asList(this));
+                treeComponent = new VerticalTreeComponent(this);
                 break;
             case unrooted:
-                treeComponent = new UnrootedTreeComponent(Arrays.asList(this));
+                treeComponent = new UnrootedTreeComponent(this);
                 break;
         }
     }

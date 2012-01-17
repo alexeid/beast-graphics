@@ -57,9 +57,8 @@ public class TikzTreeGrid extends beast.core.Runnable {
 
             TreeComponent component = drawing.getComponent();
 
-            if (oneScale.get()) component.setTreeHeightScaleFactor(width.get() / maxRootHeight);
-            component.setTreeHeight(height.get());
-            component.setTreeWidth(width.get());
+            component.setSize(new Dimension(width.get(), height.get()));
+            if (oneScale.get()) component.rootHeightForScale = maxRootHeight;
 
             component.paint(g);
             count += 1;

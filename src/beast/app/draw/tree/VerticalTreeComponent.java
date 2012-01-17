@@ -5,6 +5,8 @@ import beast.evolution.tree.Tree;
 import org.jtikz.TikzRenderingHints;
 
 import java.awt.*;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Path2D;
 import java.util.List;
 
 /**
@@ -12,15 +14,15 @@ import java.util.List;
  */
 public class VerticalTreeComponent extends TreeComponent {
 
-    public VerticalTreeComponent(List<TreeDrawing> treeDrawings) {
+    public VerticalTreeComponent(TreeDrawing treeDrawing) {
 
-        super(treeDrawings, 0, 0, true);
+        super(treeDrawing, 0, 0, true);
     }
 
 
-    public VerticalTreeComponent(List<TreeDrawing> treeDrawings, double nodeHeightScale, double nodeSpacingScale) {
+    public VerticalTreeComponent(TreeDrawing treeDrawing, double nodeHeightScale, double nodeSpacingScale) {
 
-        super(treeDrawings, nodeHeightScale, nodeSpacingScale, true);
+        super(treeDrawing, nodeHeightScale, nodeSpacingScale, true);
     }
 
     @Override
@@ -44,7 +46,15 @@ public class VerticalTreeComponent extends TreeComponent {
         double position = getNodePosition(node);
         double childPosition = getNodePosition(childNode);
 
-        draw(childPosition, childHeight, position, height, g);
+        //draw(childPosition, childHeight, position, height, g);
+
+        Path2D path = new GeneralPath();
+        path.moveTo(childPosition, childHeight);
+        path.lineTo(childPosition, height);
+        path.lineTo(position, height);
+
+        g.draw(path);
+
     }
 
     @Override
@@ -54,12 +64,21 @@ public class VerticalTreeComponent extends TreeComponent {
         double pos = getNodePosition(node);
         double childPos = getNodePosition(childNode);
 
-        drawNode(branchLabel, (pos + childPos) / 2, (height + childHeight) / 2, TikzRenderingHints.VALUE_SOUTH, 9.0, g);
+        drawNode(branchLabel, childPos, (height + childHeight) / 2, TikzRenderingHints.VALUE_EAST, 9.0, g);
+    }
+
+    void drawLabel(TreeDrawing treeDrawing, Node node, Graphics2D g) {
+
+        double height = getScaledOffsetNodeHeight(treeDrawing.getTree(), node.getHeight());
+        double position = getNodePosition(node);
+
+        drawNode(node.getID(), position, height + treeDrawing.getLabelOffset(), TikzRenderingHints.VALUE_CENTER, 9, g);
     }
 
     @Override
-    void drawInternodeInterval(double nodeHeight, double p1, double p2, Graphics2D g) {
-        draw(p1, nodeHeight, p2, nodeHeight, g);
+    void drawInternodeInterval(String label, double scaledNodeHeight, double p1, double p2, Graphics2D g) {
+        draw(p1, scaledNodeHeight, p2, scaledNodeHeight, g);
+        if (label != null) drawNode(label, p2, scaledNodeHeight, TikzRenderingHints.VALUE_WEST,9,g);
     }
 
     static String ladderTree(int size) {
