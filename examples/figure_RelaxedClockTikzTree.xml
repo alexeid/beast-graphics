@@ -33,7 +33,8 @@
         </input>
     </tree>
 
-    <run spec='beast.app.draw.tree.TikzTreeGrid' fileName="testTikzTree2.tex" width="180" height="150" oneScale="true"
+    <run spec='beast.app.draw.tree.TikzTreeGrid' fileName="figure_RelaxedClockTikzTree.tex" width="180" height="150"
+         oneScale="true"
          strideLength="2"
          isHorizontalStride="true" columnSpacer="40" pdflatexPath="/usr/texbin/pdflatex">
 
