@@ -9,8 +9,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Path2D;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author Alexei Drummond
@@ -49,7 +47,7 @@ public class SquareTreeComponent extends TreeComponent {
         double childHeight = getScaledOffsetNodeHeight(tree, childNode.getHeight());
         double childPos = getNodePosition(childNode);
 
-        drawNode(branchLabel, (height + childHeight) / 2, childPos, TikzRenderingHints.VALUE_SOUTH, 9.0, g);
+        drawNode(branchLabel, (height + childHeight) / 2, childPos, TikzRenderingHints.VALUE_SOUTH, TikzRenderingHints.VALUE_scriptsize, g);
     }
 
     public static void main(String[] args) throws Exception {

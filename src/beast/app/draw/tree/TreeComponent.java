@@ -2,8 +2,6 @@ package beast.app.draw.tree;
 
 import beast.evolution.alignment.Alignment;
 import beast.evolution.alignment.Sequence;
-import beast.evolution.alignment.Taxon;
-import beast.evolution.alignment.TaxonSet;
 import beast.evolution.tree.Node;
 import beast.evolution.tree.Tree;
 import beast.evolution.tree.coalescent.TreeIntervals;
@@ -14,10 +12,8 @@ import org.jtikz.TikzRenderingHints;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Line2D;
-import java.text.Format;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -120,7 +116,6 @@ public class TreeComponent extends JComponent {
     }
 
 
-
     double getTotalSizeForNodeSpacing() {
         return getHeight();
     }
@@ -187,14 +182,18 @@ public class TreeComponent extends JComponent {
         g.draw(new Line2D.Double(x1, y1, x2, y2));
     }
 
-    void drawNode(String label, double x, double y, Object anchor, double fontSize, Graphics2D g) {
-        Object oldHintValue = g.getRenderingHint(TikzRenderingHints.KEY_NODE_ANCHOR);
+    void drawNode(String label, double x, double y, Object anchor, Object fontSize, Graphics2D g) {
+        Object oldAnchorValue = g.getRenderingHint(TikzRenderingHints.KEY_NODE_ANCHOR);
+        Object oldFontSize = g.getRenderingHint(TikzRenderingHints.KEY_FONT_SIZE);
         g.setRenderingHint(TikzRenderingHints.KEY_NODE_ANCHOR, anchor);
-        Font oldFont = g.getFont();
-        g.setFont(oldFont.deriveFont((float) fontSize));
+        g.setRenderingHint(TikzRenderingHints.KEY_FONT_SIZE, fontSize);
+        //Font oldFont = g.getFont();
+        //g.setFont(oldFont.deriveFont((float) fontSize));
+
         g.drawString(label, (float) x, (float) y);
-        if (oldHintValue != null) g.setRenderingHint(TikzRenderingHints.KEY_NODE_ANCHOR, oldHintValue);
-        g.setFont(oldFont);
+        if (oldAnchorValue != null) g.setRenderingHint(TikzRenderingHints.KEY_NODE_ANCHOR, oldAnchorValue);
+        if (oldFontSize != null) g.setRenderingHint(TikzRenderingHints.KEY_FONT_SIZE, oldFontSize);
+        //g.setFont(oldFont);
     }
 
     private boolean isDrawingBranchLabels(TreeDrawing treeDrawing) {
@@ -212,7 +211,7 @@ public class TreeComponent extends JComponent {
         draw(height, position, childHeight, childPosition, g);
     }
 
-    void drawBranchLabel(String label, Tree tree, Node node, Node childNode, Object anchor, double fontSize, Graphics2D g) {
+    void drawBranchLabel(String label, Tree tree, Node node, Node childNode, Object fontSize, Graphics2D g) {
 
         double height = getScaledOffsetNodeHeight(tree, node.getHeight());
         double childHeight = getScaledOffsetNodeHeight(tree, childNode.getHeight());
@@ -220,7 +219,7 @@ public class TreeComponent extends JComponent {
         double position = getNodePosition(node);
         double childPosition = getNodePosition(childNode);
 
-        drawNode(label, (height + childHeight) / 2, (position + childPosition) / 2, anchor, fontSize, g);
+        drawNode(label, (height + childHeight) / 2, (position + childPosition) / 2, TikzRenderingHints.VALUE_SOUTH, fontSize, g);
     }
 
     void drawLabel(TreeDrawing treeDrawing, Node node, Graphics2D g) {
@@ -228,7 +227,7 @@ public class TreeComponent extends JComponent {
         double height = getScaledOffsetNodeHeight(treeDrawing.getTree(), node.getHeight());
         double position = getNodePosition(node);
 
-        drawNode(node.getID(), height + treeDrawing.getLabelOffset(), position, TikzRenderingHints.VALUE_CENTER, 9, g);
+        drawNode(node.getID(), height + treeDrawing.getLabelOffset(), position, TikzRenderingHints.VALUE_CENTER, TikzRenderingHints.VALUE_normalsize, g);
     }
 
     void draw(TreeDrawing treeDrawing, Node node, Graphics2D g) {
@@ -301,7 +300,7 @@ public class TreeComponent extends JComponent {
                     } else {
                         branchLabel = metaData.toString();
                     }
-                    drawBranchLabel(branchLabel, tree, node, childNode, TikzRenderingHints.VALUE_SOUTH, 9.0, g);
+                    drawBranchLabel(branchLabel, tree, node, childNode, TikzRenderingHints.VALUE_scriptsize, g);
                 }
             }
         }
@@ -320,8 +319,8 @@ public class TreeComponent extends JComponent {
         double p1 = firstLeafNodePosition(tree) / 2;
         double p2 = getTotalSizeForNodeSpacing() - p1;
 
-        String label = "$t=" + format.format(unscaledHeight) + "$";
-        
+        String label = format.format(unscaledHeight);
+
         drawInternodeInterval(label, getScaledOffsetNodeHeight(tree, unscaledHeight), p1, p2, g);
         for (double interval : intervals) {
 
@@ -333,7 +332,7 @@ public class TreeComponent extends JComponent {
             }
         }
         g.setStroke(s);
-        
+
         if (drawAxis) {
 
         }
@@ -341,7 +340,8 @@ public class TreeComponent extends JComponent {
 
     void drawInternodeInterval(String label, double scaledNodeHeight, double p1, double p2, Graphics2D g) {
         draw(scaledNodeHeight, p1, scaledNodeHeight, p2, g);
-        if (label != null) drawNode(label, scaledNodeHeight, p2, TikzRenderingHints.VALUE_NORTH,9,g);
+        if (label != null)
+            drawNode(label, scaledNodeHeight, p2, TikzRenderingHints.VALUE_NORTH, TikzRenderingHints.VALUE_scriptsize, g);
     }
 
 
@@ -366,7 +366,7 @@ public class TreeComponent extends JComponent {
         sequences.add(new Sequence("E", "A"));
 
         Alignment alignment = new Alignment(sequences, 4, "nucleotide");
-        
+
         TreeComponent treeComponent = new SquareTreeComponent(new TreeDrawing(new TreeParser(alignment, newickTree)));
 
         TikzGraphics2D tikzGraphics2D = new TikzGraphics2D();

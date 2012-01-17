@@ -24,11 +24,10 @@ public class TikzTreeGrid extends beast.core.Runnable {
     public Input<Integer> width = new Input<Integer>("width", "the width of a grid cell in the figure", 150);
     public Input<Integer> height = new Input<Integer>("height", "the height of a grid cell in the figure", 150);
     public Input<Boolean> oneScale = new Input<Boolean>("oneScale", "All trees are scaled to a single scale for node heights", false);
+    public Input<Integer> columnSpacer = new Input<Integer>("columnSpacer", "The space in points between columns", 10);
+    public Input<Integer> rowSpacer = new Input<Integer>("rowSpacer", "The space in points between rows", 10);
     public Input<String> fileName = new Input<String>("fileName", "the name of the file to write Tikz code to", "");
     public Input<String> pdflatexPath = new Input<String>("pdflatexPath", "the path to pdflatex; if provided then will be run automatically", "");
-
-    private double xSpacer = 20;
-    private double ySpacer = 10;
 
     /**
      * The maximum root height of trees
@@ -52,6 +51,9 @@ public class TikzTreeGrid extends beast.core.Runnable {
      */
     public void paint(Graphics2D g) {
 
+        int cSpacer = columnSpacer.get();
+        int rSpacer = rowSpacer.get();
+
         int count = 0;
         for (TreeDrawing drawing : treeDrawing.get()) {
 
@@ -65,21 +67,19 @@ public class TikzTreeGrid extends beast.core.Runnable {
             if (count % strideLength.get() == 0) {
                 // next stride
                 if (!isHorizontalStride.get()) {
-                    g.translate(height.get() + xSpacer, -(strideLength.get() - 1) * (width.get() + ySpacer));
+                    g.translate(height.get() + cSpacer, -(strideLength.get() - 1) * (width.get() + rSpacer));
                 } else {
-                    g.translate(-(strideLength.get() - 1) * (height.get() + xSpacer), width.get() + ySpacer);
+                    g.translate(-(strideLength.get() - 1) * (height.get() + cSpacer), width.get() + rSpacer);
                 }
             } else {
                 if (!isHorizontalStride.get()) {
-                    g.translate(0, width.get() + ySpacer);
+                    g.translate(0, width.get() + rSpacer);
                 } else {
-                    g.translate(height.get() + xSpacer, 0);
+                    g.translate(height.get() + cSpacer, 0);
                 }
             }
         }
-
     }
-
 
     public void run() throws IOException, InterruptedException {
 

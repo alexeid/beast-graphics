@@ -27,27 +27,29 @@
         </taxonset>
         <input name='newick'>
             <![CDATA[
-            ((A:1.5,B:1):1,(C:1.5,D:5.25):1);
+            (D:4.5,((B:1,A:1.5):2,C:1.5):0.75);
             ]]>
             <!--(((A:0.3,B:0.2):0.2,C:0.2):0.2,D:0.8); -->
         </input>
     </tree>
 
     <run spec='beast.app.draw.tree.TikzTreeGrid' fileName="testTikzTree2.tex" width="180" height="150" oneScale="true"
-         isHorizontalStride="false" pdflatexPath="/usr/texbin/pdflatex">
+         strideLength="2"
+         isHorizontalStride="true" columnSpacer="40" pdflatexPath="/usr/texbin/pdflatex">
 
         <treeDrawing spec='beast.app.draw.tree.TreeDrawing' showLeafLabels="true"
-                     lineThickness="1.25" labelOffset="10" showInternodeIntervals="true" branchLabels="&amp;rate" style="vertical">
+                     lineThickness="1.25" labelOffset="10" showInternodeIntervals="true" branchLabels="&amp;rate"
+                     style="vertical">
             <tree idref="tree"/>
         </treeDrawing>
         <treeDrawing spec='beast.app.draw.tree.TreeDrawing' showLeafLabels="true"
-                     lineThickness="1.25" labelOffset="10" showInternodeIntervals="false">
+                     lineThickness="1.25" labelOffset="10" showInternodeIntervals="false" style="vertical">
             <tree idref="tree2"/>
         </treeDrawing>
-        <treeDrawing spec='beast.app.draw.tree.UnrootedTreeDrawing' showLeafLabels="true"
-                     lineThickness="1.25" labelOffset="10">
-            <tree idref="tree2"/>
-        </treeDrawing>
+        <!-- <treeDrawing spec='beast.app.draw.tree.UnrootedTreeDrawing' showLeafLabels="true"
+                    lineThickness="1.25" labelOffset="10">
+           <tree idref="tree2"/>
+       </treeDrawing> -->
 
     </run>
 </beast>

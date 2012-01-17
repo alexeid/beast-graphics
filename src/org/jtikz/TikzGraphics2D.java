@@ -44,7 +44,7 @@ public class TikzGraphics2D extends AbstractGraphicsInterface {
      * Default node anchoring for drawString nodes.
      */
     Object nodeAnchor = TikzRenderingHints.VALUE_SOUTH_WEST;
-
+    Object fontSize = TikzRenderingHints.VALUE_normalsize;
 
     /**
      * Creates a new TikzGraphics2D object that will output the code to <code>system.out</code>.
@@ -99,6 +99,7 @@ public class TikzGraphics2D extends AbstractGraphicsInterface {
 
     String handleOptions(String options, boolean isText) {
         StringBuffer o = new StringBuffer(options);
+
         if (!color.equals(Color.BLACK))
             addOption(o, (isText ? "text=" : "") + colorToTikz(color));
         if (color.getAlpha() != 255)
@@ -175,8 +176,13 @@ public class TikzGraphics2D extends AbstractGraphicsInterface {
         if (hints.containsKey(TikzRenderingHints.KEY_NODE_ANCHOR)) {
             nodeAnchor = hints.get(TikzRenderingHints.KEY_NODE_ANCHOR);
         }
+        if (hints.containsKey(TikzRenderingHints.KEY_FONT_SIZE)) {
+            fontSize = hints.get(TikzRenderingHints.KEY_FONT_SIZE);
+        }
 
-        addCommand("\\node" + handleOptions(nodeAnchor != TikzRenderingHints.VALUE_CENTER ? "anchor=" + nodeAnchor : "", true) + " at (" + format.format(x) + "pt, " + format.format(y) + "pt) {" + toTeX(s) + "};");
+        addCommand("\\node" + handleOptions(nodeAnchor != TikzRenderingHints.VALUE_CENTER ? "anchor=" + nodeAnchor : "", true) +
+                " at (" + format.format(x) + "pt, " + format.format(y) + "pt) {" +
+                ((fontSize != TikzRenderingHints.VALUE_normalsize) ? fontSize + "{" : "") + toTeX(s) + (fontSize != TikzRenderingHints.VALUE_normalsize ? "}" : "") + "};");
     }
 
     protected void handlePath(PathIterator i, Action action) {

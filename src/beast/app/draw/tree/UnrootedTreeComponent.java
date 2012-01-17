@@ -54,8 +54,8 @@ public class UnrootedTreeComponent extends TreeComponent {
         if (node.isRoot()) {
             fullAngle = 2 * Math.PI;
 
-            node.setMetaData("x1", (double)getWidth() / 2.0);
-            node.setMetaData("y1", (double)getHeight() / 2.0);
+            node.setMetaData("x1", (double) getWidth() / 2.0);
+            node.setMetaData("y1", (double) getHeight() / 2.0);
 
         } else {
 
@@ -113,6 +113,6 @@ public class UnrootedTreeComponent extends TreeComponent {
         double x1 = x + treeDrawing.getLabelOffset() * Math.cos(theta);
         double y1 = y + treeDrawing.getLabelOffset() * Math.sin(theta);
 
-        drawNode(node.getID(), x1, y1, TikzRenderingHints.VALUE_CENTER, 9, g);
+        drawNode(node.getID(), x1, y1, TikzRenderingHints.VALUE_CENTER, TikzRenderingHints.VALUE_normalsize, g);
     }
 }

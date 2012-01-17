@@ -7,7 +7,6 @@ import org.jtikz.TikzRenderingHints;
 import java.awt.*;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Path2D;
-import java.util.List;
 
 /**
  * @author Alexei Drummond
@@ -58,13 +57,13 @@ public class VerticalTreeComponent extends TreeComponent {
     }
 
     @Override
-    void drawBranchLabel(String branchLabel, Tree tree, Node node, Node childNode, Object anchor, double fontSize, Graphics2D g) {
+    void drawBranchLabel(String branchLabel, Tree tree, Node node, Node childNode, Object fontSize, Graphics2D g) {
         double height = getScaledOffsetNodeHeight(tree, node.getHeight());
         double childHeight = getScaledOffsetNodeHeight(tree, childNode.getHeight());
         double pos = getNodePosition(node);
         double childPos = getNodePosition(childNode);
 
-        drawNode(branchLabel, childPos, (height + childHeight) / 2, TikzRenderingHints.VALUE_EAST, 9.0, g);
+        drawNode(branchLabel, childPos, (height + childHeight) / 2, TikzRenderingHints.VALUE_EAST, fontSize, g);
     }
 
     void drawLabel(TreeDrawing treeDrawing, Node node, Graphics2D g) {
@@ -72,13 +71,14 @@ public class VerticalTreeComponent extends TreeComponent {
         double height = getScaledOffsetNodeHeight(treeDrawing.getTree(), node.getHeight());
         double position = getNodePosition(node);
 
-        drawNode(node.getID(), position, height + treeDrawing.getLabelOffset(), TikzRenderingHints.VALUE_CENTER, 9, g);
+        drawNode(node.getID(), position, height + treeDrawing.getLabelOffset(), TikzRenderingHints.VALUE_CENTER, TikzRenderingHints.VALUE_normalsize, g);
     }
 
     @Override
     void drawInternodeInterval(String label, double scaledNodeHeight, double p1, double p2, Graphics2D g) {
         draw(p1, scaledNodeHeight, p2, scaledNodeHeight, g);
-        if (label != null) drawNode(label, p2, scaledNodeHeight, TikzRenderingHints.VALUE_WEST,9,g);
+        if (label != null)
+            drawNode(label, p2, scaledNodeHeight, TikzRenderingHints.VALUE_WEST, TikzRenderingHints.VALUE_scriptsize, g);
     }
 
     static String ladderTree(int size) {
