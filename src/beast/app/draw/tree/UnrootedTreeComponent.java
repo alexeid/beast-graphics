@@ -2,7 +2,6 @@ package beast.app.draw.tree;
 
 import beast.evolution.tree.Node;
 import beast.evolution.tree.Tree;
-import org.jtikz.TikzRenderingHints;
 
 import java.awt.*;
 
@@ -30,7 +29,7 @@ public class UnrootedTreeComponent extends TreeComponent {
         }
 
         if (node.isLeaf()) {
-            drawLabel(treeDrawing, node, g);
+            drawLeafLabel(node, g);
         } else {
 
             for (Node childNode : node.getChildren()) {
@@ -39,7 +38,7 @@ public class UnrootedTreeComponent extends TreeComponent {
 
             for (Node childNode : node.getChildren()) {
 
-                drawBranch(tree, node, childNode, g);
+                drawBranch(node, childNode, g);
             }
         }
     }
@@ -92,27 +91,27 @@ public class UnrootedTreeComponent extends TreeComponent {
         }
     }
 
-    void drawBranch(Tree tree, Node node, Node childNode, Graphics2D g) {
-
-        double x1 = (Double) node.getMetaData("x1");
-        double y1 = (Double) node.getMetaData("y1");
-
-        double x2 = (Double) childNode.getMetaData("x1");
-        double y2 = (Double) childNode.getMetaData("y1");
-
-        draw(x1, y1, x2, y2, g);
-    }
-
-    void drawLabel(TreeDrawing treeDrawing, Node node, Graphics2D g) {
-
-        double x = (Double) node.getMetaData("x1");
-        double y = (Double) node.getMetaData("y1");
-
-        double theta = (Double) node.getMetaData("theta");
-
-        double x1 = x + treeDrawing.getLabelOffset() * Math.cos(theta);
-        double y1 = y + treeDrawing.getLabelOffset() * Math.sin(theta);
-
-        drawNode(node.getID(), x1, y1, TikzRenderingHints.VALUE_CENTER, TikzRenderingHints.VALUE_normalsize, g);
-    }
+//    void drawBranch(Tree tree, Node node, Node childNode, Graphics2D g) {
+//
+//        double x1 = (Double) node.getMetaData("x1");
+//        double y1 = (Double) node.getMetaData("y1");
+//
+//        double x2 = (Double) childNode.getMetaData("x1");
+//        double y2 = (Double) childNode.getMetaData("y1");
+//
+//        draw(x1, y1, x2, y2, g);
+//    }
+//
+//    void drawLeafLabel(TreeDrawing treeDrawing, Node node, Graphics2D g) {
+//
+//        double x = (Double) node.getMetaData("x1");
+//        double y = (Double) node.getMetaData("y1");
+//
+//        double theta = (Double) node.getMetaData("theta");
+//
+//        double x1 = x + treeDrawing.getLabelOffset() * Math.cos(theta);
+//        double y1 = y + treeDrawing.getLabelOffset() * Math.sin(theta);
+//
+//        drawNode(node.getID(), x1, y1, TikzRenderingHints.VALUE_CENTER, TikzRenderingHints.VALUE_normalsize, g);
+//    }
 }

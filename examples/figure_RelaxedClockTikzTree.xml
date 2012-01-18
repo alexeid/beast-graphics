@@ -39,12 +39,12 @@
          isHorizontalStride="true" columnSpacer="40" pdflatexPath="/usr/texbin/pdflatex">
 
         <treeDrawing spec='beast.app.draw.tree.TreeDrawing' showLeafLabels="true"
-                     lineThickness="1.25" labelOffset="10" showInternodeIntervals="true" branchLabels="&amp;rate"
-                     style="vertical">
+                     lineThickness="1.25" labelOffset="10" showLeafTimes="true" branchLabels="&amp;rate"
+                     orientation="up">
             <tree idref="tree"/>
         </treeDrawing>
         <treeDrawing spec='beast.app.draw.tree.TreeDrawing' showLeafLabels="true"
-                     lineThickness="1.25" labelOffset="10" showInternodeIntervals="false" style="vertical">
+                     lineThickness="1.25" labelOffset="10" showLeafTimes="false" orientation="up">
             <tree idref="tree2"/>
         </treeDrawing>
         <!-- <treeDrawing spec='beast.app.draw.tree.UnrootedTreeDrawing' showLeafLabels="true"

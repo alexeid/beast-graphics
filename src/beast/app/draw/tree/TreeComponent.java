@@ -12,7 +12,10 @@ import org.jtikz.TikzRenderingHints;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.Line2D;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +26,10 @@ import java.util.List;
 public class TreeComponent extends JComponent {
 
     TreeDrawing treeDrawing;
+    TreeDrawingTransform transform = TreeDrawingTransform.UP;
+    BranchStyle branchStyle = BranchStyle.SQUARE;
+
+    Tree tree;
 
     // the position of the "current" leaf node
     private double p = 0;
@@ -44,6 +51,12 @@ public class TreeComponent extends JComponent {
     double rootHeightForScale;
     private boolean drawAxis = true;
 
+    private TreeDrawing.LeafShape leafShape;
+    private double leafSize = 4;
+    private Color leafColor = Color.white;
+
+    private Rectangle2D bounds = new Rectangle2D.Double(0, 0, 1, 1);
+
     /**
      * @param treeDrawing the  tree drawing
      * @param isTriangle  true if tree should be drawn so that outside branches form a triangle on ultrametric trees
@@ -52,6 +65,11 @@ public class TreeComponent extends JComponent {
 
         this(treeDrawing, 0, 0, isTriangle);
 
+    }
+
+    public void setBounds(Rectangle2D bounds) {
+        this.bounds = bounds;
+        setSize((int) bounds.getWidth(), (int) bounds.getHeight());
     }
 
     public TreeComponent(TreeDrawing treeDrawing, double nodeHeightScale, double nodeSpacing, boolean isTriangle) {
@@ -65,6 +83,7 @@ public class TreeComponent extends JComponent {
         this.ns = nodeSpacing;
 
         this.treeDrawing = treeDrawing;
+        this.tree = treeDrawing.getTree();
 
         rootHeightForScale = treeDrawing.getTree().getRoot().getHeight();
     }
@@ -79,13 +98,6 @@ public class TreeComponent extends JComponent {
         System.out.println(node + " position=" + o);
 
         return (Double) o;
-    }
-
-    /**
-     * @return the distance from the edge of component to the first leaf when traveling across the leaves
-     */
-    double firstLeafNodePosition(Tree tree) {
-        return getNodeSpacing(tree) / 2;
     }
 
     /**
@@ -120,25 +132,12 @@ public class TreeComponent extends JComponent {
         return getScaledTreeHeight() - unscaledNodeHeight * getNodeHeightScale(tree) + rootOffset();
     }
 
-
-    double getTotalSizeForNodeSpacing() {
-        return getHeight();
-    }
-
-    /**
-     * The spacing between the nodes (The number of pixels between adjacent leaf nodes)
-     */
-    final double getNodeSpacing(Tree tree) {
-        if (ns == 0) return getTotalSizeForNodeSpacing() / tree.getLeafNodeCount();
-        return ns;
-    }
-
     void setTipValues(Tree tree, Node node) {
         if (node.isLeaf()) {
             node.setMetaData("p", p);
             node.setMetaData("pmin", p);
             node.setMetaData("pmax", p);
-            p += getNodeSpacing(tree);
+            p += getCanonicalNodeSpacing(tree);
         } else {
 
             double pmin = Double.MAX_VALUE;
@@ -182,58 +181,101 @@ public class TreeComponent extends JComponent {
 //        }
 //    }
 
-    void draw(double x1, double y1, double x2, double y2, Graphics2D g) {
+    void drawLeafNode(Point2D p, Graphics2D g) {
+        Shape shape = null;
+        double halfSize = leafSize / 2.0;
 
-        g.draw(new Line2D.Double(x1, y1, x2, y2));
-    }
+        switch (leafShape) {
+            case circle:
+                shape = new Ellipse2D.Double(p.getX() - halfSize, p.getY() - halfSize, leafSize, leafSize);
+                break;
+            case square:
+                shape = new Rectangle2D.Double(p.getX() - halfSize, p.getY() - halfSize, leafSize, leafSize);
+                break;
+            case triangle:
+                Path2D path = new Path2D.Double();
+                path.moveTo(p.getX(), p.getY() - halfSize);
+                path.lineTo(p.getX() + halfSize, p.getY() + halfSize);
+                path.lineTo(p.getX() - halfSize, p.getY() + halfSize);
+                path.closePath();
+                shape = path;
+            default:
+        }
+        Color oldColor = g.getColor();
+        g.setColor(leafColor);
+        g.fill(shape);
+        g.setColor(oldColor);
+        g.draw(shape);
 
-    void drawNode(String label, double x, double y, Object anchor, Object fontSize, Graphics2D g) {
-        Object oldAnchorValue = g.getRenderingHint(TikzRenderingHints.KEY_NODE_ANCHOR);
-        Object oldFontSize = g.getRenderingHint(TikzRenderingHints.KEY_FONT_SIZE);
-        g.setRenderingHint(TikzRenderingHints.KEY_NODE_ANCHOR, anchor);
-        g.setRenderingHint(TikzRenderingHints.KEY_FONT_SIZE, fontSize);
-        //Font oldFont = g.getFont();
-        //g.setFont(oldFont.deriveFont((float) fontSize));
-
-        g.drawString(label, (float) x, (float) y);
-        if (oldAnchorValue != null) g.setRenderingHint(TikzRenderingHints.KEY_NODE_ANCHOR, oldAnchorValue);
-        if (oldFontSize != null) g.setRenderingHint(TikzRenderingHints.KEY_FONT_SIZE, oldFontSize);
         //g.setFont(oldFont);
     }
+
+    void drawString(String string, double x, double y, Object anchor, Object fontSize, Graphics2D g) {
+        if (string != null) {
+            Object oldAnchorValue = g.getRenderingHint(TikzRenderingHints.KEY_NODE_ANCHOR);
+            Object oldFontSize = g.getRenderingHint(TikzRenderingHints.KEY_FONT_SIZE);
+            g.setRenderingHint(TikzRenderingHints.KEY_NODE_ANCHOR, anchor);
+            g.setRenderingHint(TikzRenderingHints.KEY_FONT_SIZE, fontSize);
+
+            g.drawString(string, (float) x, (float) y);
+
+            if (oldAnchorValue != null) g.setRenderingHint(TikzRenderingHints.KEY_NODE_ANCHOR, oldAnchorValue);
+            if (oldFontSize != null) g.setRenderingHint(TikzRenderingHints.KEY_FONT_SIZE, oldFontSize);
+        }
+
+    }
+
 
     private boolean isDrawingBranchLabels(TreeDrawing treeDrawing) {
         return treeDrawing.getBranchLabels() != null && !treeDrawing.getBranchLabels().equals("");
     }
 
-    void drawBranch(Tree tree, Node node, Node childNode, Graphics2D g) {
-
-        double height = getScaledOffsetNodeHeight(tree, node.getHeight());
-        double childHeight = getScaledOffsetNodeHeight(tree, childNode.getHeight());
-
-        double position = getNodePosition(node);
-        double childPosition = getNodePosition(childNode);
-
-        draw(height, position, childHeight, childPosition, g);
+    private Point2D getCanonicalNodePoint2D(Node node) {
+        return new Point2D.Double(getCanonicalNodeX(node), node.getHeight() / node.getTree().getRoot().getHeight());
     }
 
-    void drawBranchLabel(String label, Tree tree, Node node, Node childNode, Object fontSize, Graphics2D g) {
-
-        double height = getScaledOffsetNodeHeight(tree, node.getHeight());
-        double childHeight = getScaledOffsetNodeHeight(tree, childNode.getHeight());
-
-        double position = getNodePosition(node);
-        double childPosition = getNodePosition(childNode);
-
-        drawNode(label, (height + childHeight) / 2, (position + childPosition) / 2, TikzRenderingHints.VALUE_SOUTH, fontSize, g);
+    private double getCanonicalNodeX(Node node) {
+        return (Double) node.getMetaData("p");
     }
 
-    void drawLabel(TreeDrawing treeDrawing, Node node, Graphics2D g) {
+    private double getCanonicalNodeSpacing(Tree tree) {
+        return 1.0 / (tree.getLeafNodeCount() - 1);
+    }
 
-        double height = getScaledOffsetNodeHeight(treeDrawing.getTree(), node.getHeight());
-        double position = getNodePosition(node);
+    private Point2D getTransformedNodePoint2D(Node node) {
+        return transform.getTransform(bounds).transform(getCanonicalNodePoint2D(node), null);
+    }
 
-        if (node.getID() != null)
-            drawNode(node.getID(), height + treeDrawing.getLabelOffset(), position, TikzRenderingHints.VALUE_CENTER, TikzRenderingHints.VALUE_normalsize, g);
+    final void drawBranch(Node node, Node childNode, Graphics2D g) {
+
+        Shape shape = branchStyle.getBranchShape(getCanonicalNodePoint2D(childNode), getCanonicalNodePoint2D(node));
+        Shape transformed = transform.getTransform(bounds).createTransformedShape(shape);
+
+        g.draw(transformed);
+    }
+
+
+    /**
+     * Draws the label of a particular branch along the branch
+     *
+     * @param label     the label text
+     * @param tree      the tree
+     * @param node      the parent node
+     * @param childNode the child node
+     * @param fontSize  a hint about font size
+     * @param g         the graphics object to draw to
+     */
+    final void drawBranchLabel(String label, Tree tree, Node node, Node childNode, Object fontSize, Graphics2D g) {
+
+        //Point2D p = transform.getBranchLabelPoint2D(this, tree, node, childNode);
+        //drawString(label, p.getX(), p.getY(), transform.getBranchLabelAnchor(), fontSize, g);
+    }
+
+    final void drawLeafLabel(Node node, Graphics2D g) {
+
+        Point2D nodePoint = getTransformedNodePoint2D(node);
+
+        drawString(node.getID(), nodePoint.getX(), nodePoint.getY(), transform.getLeafLabelAnchor(), TikzRenderingHints.VALUE_normalsize, g);
     }
 
     void draw(TreeDrawing treeDrawing, Node node, Graphics2D g) {
@@ -246,7 +288,7 @@ public class TreeComponent extends JComponent {
 
         g.setStroke(new BasicStroke((float) treeDrawing.getLineThickness()));
 
-        p = firstLeafNodePosition(tree);
+        p = 0.0; // canonical positioning goes from 0 to 1.
 
         if (node.isRoot()) {
             setTipValues(tree, node);
@@ -254,17 +296,15 @@ public class TreeComponent extends JComponent {
 
         if (node.isLeaf()) {
             if (treeDrawing.showLeafNodes()) {
-                drawLabel(treeDrawing, node, g);
+                //drawLeafNode(getTransformedNodePoint2D(node), g);
+                drawLeafLabel(node, g);
             }
         } else {
 
             double cp = 0;
             if (isTriangle) {
                 if (node.isRoot()) {
-
-                    int tipCount = tree.getLeafNodeCount();
-
-                    cp = ((tipCount - 1) * getNodeSpacing(tree)) / 2.0 + firstLeafNodePosition(tree);
+                    cp = 0.5;
                 } else {
 
                     Node parent = node.getParent();
@@ -299,7 +339,7 @@ public class TreeComponent extends JComponent {
 
             for (Node childNode : node.getChildren()) {
 
-                drawBranch(tree, node, childNode, g);
+                drawBranch(node, childNode, g);
                 if (isDrawingBranchLabels(treeDrawing)) {
                     Object metaData = childNode.getMetaData(treeDrawing.getBranchLabels());
                     String branchLabel;
@@ -322,8 +362,8 @@ public class TreeComponent extends JComponent {
 
         double unscaledHeight = 0.0;
 
-        double p1 = firstLeafNodePosition(tree) / 2;
-        double p2 = getTotalSizeForNodeSpacing() - p1;
+        double p1 = 0;
+        double p2 = 1;
 
         String label = format.format(unscaledHeight);
         IntervalType oldIntervalType = IntervalType.SAMPLE;
@@ -354,9 +394,9 @@ public class TreeComponent extends JComponent {
     }
 
     void drawNodeTime(String label, double scaledNodeHeight, double p1, double p2, Graphics2D g) {
-        draw(scaledNodeHeight, p1, scaledNodeHeight, p2, g);
-        if (label != null)
-            drawNode(label, scaledNodeHeight, p2, TikzRenderingHints.VALUE_NORTH, TikzRenderingHints.VALUE_scriptsize, g);
+        //draw(scaledNodeHeight, p1, scaledNodeHeight, p2, g);
+        //if (label != null)
+        //    drawString(label, scaledNodeHeight, p2, TikzRenderingHints.VALUE_NORTH, TikzRenderingHints.VALUE_scriptsize, g);
     }
 
 
@@ -400,6 +440,18 @@ public class TreeComponent extends JComponent {
 
     public void setTreeHeightScaleFactor(double scaleFactor) {
         nhs = scaleFactor;
+    }
+
+    public void setLeafShape(TreeDrawing.LeafShape leafShape) {
+        this.leafShape = leafShape;
+    }
+
+    public void setLeafColor(Color color) {
+        leafColor = color;
+    }
+
+    public void setLeafSize(double leafSize) {
+        this.leafSize = leafSize;
     }
 }
 

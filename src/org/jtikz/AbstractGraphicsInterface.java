@@ -1,13 +1,20 @@
 package org.jtikz;
 
-import java.text.*;
 import java.awt.*;
-import java.awt.image.*;
-import java.awt.image.renderable.*;
-import java.awt.font.*;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
 import java.awt.geom.*;
-import java.io.*;
-import java.util.*;
+import java.awt.image.*;
+import java.awt.image.renderable.RenderableImage;
+import java.io.Closeable;
+import java.io.Flushable;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.text.AttributedCharacterIterator;
+import java.text.CharacterIterator;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 public abstract class AbstractGraphicsInterface extends Graphics2D implements Closeable, Flushable {
     LinkedList<AbstractGraphicsInterface> children;
@@ -22,15 +29,15 @@ public abstract class AbstractGraphicsInterface extends Graphics2D implements Cl
     Color background;
     BasicStroke stroke;
     LinkedList<GraphicsCommand> commands;
-    
+
     protected PrintStream out;
 
     Map<RenderingHints.Key, Object> hints = new HashMap<RenderingHints.Key, Object>();
 
-    protected static enum Action { DRAW, FILL, CLIP }
+    protected static enum Action {DRAW, FILL, CLIP}
 
     protected void addCommand(Object command) {
-        if(parent != null)
+        if (parent != null)
             parent.addCommand(command);
         else {
             System.err.println("Command: " + command);
@@ -54,6 +61,7 @@ public abstract class AbstractGraphicsInterface extends Graphics2D implements Cl
         System.err.println("Transform: " + g.transform);
         return g;
     }
+
     public final AbstractGraphicsInterface create(int x, int y, int width, int height) {
         System.err.println("create(" + x + ", " + y + ", " + width + ", " + height + ", " + currentClip + ")");
         AbstractGraphicsInterface g = create();
@@ -69,11 +77,12 @@ public abstract class AbstractGraphicsInterface extends Graphics2D implements Cl
     public AbstractGraphicsInterface() {
         this(System.out);
     }
+
     public AbstractGraphicsInterface(OutputStream os) {
-        if(os == null)
+        if (os == null)
             os = System.out;
-        if(os instanceof PrintStream)
-            out = (PrintStream)os;
+        if (os instanceof PrintStream)
+            out = (PrintStream) os;
         else
             out = new PrintStream(os);
         parent = null;
@@ -81,10 +90,10 @@ public abstract class AbstractGraphicsInterface extends Graphics2D implements Cl
         closed = false;
         preamble = "";
         shutdownHook = new Thread() {
-                public void run() {
-                    flush();
-                }
-            };
+            public void run() {
+                flush();
+            }
+        };
         Runtime.getRuntime().addShutdownHook(shutdownHook);
         flush();
     }
@@ -92,41 +101,58 @@ public abstract class AbstractGraphicsInterface extends Graphics2D implements Cl
     public void setColor(Color c) {
         this.color = c;
     }
+
     public Color getColor() {
         return color;
     }
 
     public void draw(Shape shape) {
-        handlePath(shape.getPathIterator(transform), Action.DRAW);
+
+        if (shape instanceof Ellipse2D) {
+            Ellipse2D ellipse = (Ellipse2D) shape;
+            handleOval(ellipse.getX(), ellipse.getY(), ellipse.getWidth(), ellipse.getHeight(), false);
+        } else {
+
+            handlePath(shape.getPathIterator(transform), Action.DRAW);
+        }
     }
 
     public void fill(Shape shape) {
-        handlePath(shape.getPathIterator(transform), Action.FILL);
+        if (shape instanceof Ellipse2D) {
+            Ellipse2D ellipse = (Ellipse2D) shape;
+            handleOval(ellipse.getX(), ellipse.getY(), ellipse.getWidth(), ellipse.getHeight(), true);
+        } else {
+            handlePath(shape.getPathIterator(transform), Action.FILL);
+        }
     }
 
     public void drawPolygon(Polygon p) {
         handlePath(p.getPathIterator(transform), Action.DRAW);
     }
+
     public void fillPolygon(Polygon p) {
         handlePath(p.getPathIterator(transform), Action.FILL);
     }
+
     public void fillPolygon(int[] xPoints, int[] yPoints, int nPoints) {
         fillPolygon(new Polygon(xPoints, yPoints, nPoints));
     }
+
     public void drawPolygon(int[] xPoints, int[] yPoints, int nPoints) {
         drawPolygon(new Polygon(xPoints, yPoints, nPoints));
     }
+
     public void drawPolyline(int[] xPoints, int[] yPoints, int nPoints) {
-        if(nPoints < 2)
+        if (nPoints < 2)
             return;
-        else if(xPoints[0] == xPoints[nPoints - 1] && yPoints[0] == yPoints[nPoints - 1])
+        else if (xPoints[0] == xPoints[nPoints - 1] && yPoints[0] == yPoints[nPoints - 1])
             drawPolygon(xPoints, yPoints, nPoints);
         else {
             double newx[] = new double[xPoints.length];
             double newy[] = new double[yPoints.length];
             Point2D.Double p1 = new Point2D.Double();
             Point2D.Double p2 = new Point2D.Double();
-            for(int i=0; i<nPoints; i++) {
+            for (int i = 0; i < nPoints; i++) {
                 p1.x = xPoints[i];
                 p1.y = yPoints[i];
                 transform.transform(p1, p2);
@@ -145,8 +171,8 @@ public abstract class AbstractGraphicsInterface extends Graphics2D implements Cl
      * intelligent implementation given your specific interface.
      */
     protected void handlePolyline(double[] xPoints, double[] yPoints, int nPoints) {
-        for(int i=1; i<nPoints; i++)
-            handleLine(xPoints[i-1], yPoints[i-1], xPoints[i], yPoints[i]);
+        for (int i = 1; i < nPoints; i++)
+            handleLine(xPoints[i - 1], yPoints[i - 1], xPoints[i], yPoints[i]);
     }
 
     public void drawLine(int x1, int y1, int x2, int y2) {
@@ -160,43 +186,54 @@ public abstract class AbstractGraphicsInterface extends Graphics2D implements Cl
     public void drawOval(int x, int y, int width, int height) {
         handleOval(x, y, width, height, false);
     }
+
     public void fillOval(int x, int y, int width, int height) {
         handleOval(x, y, width, height, true);
     }
+
     private void handleOval(int x, int y, int width, int height, boolean fill) {
         Point2D p1 = transform.transform(new Point2D.Double(x, y), null);
         handleOval(p1.getX(), p1.getY(), width, height, fill);
     }
+
     protected abstract void handleOval(double x, double y, double width, double height, boolean fill);
 
     public void fillRoundRect(int x, int y, int width, int height, int arcWidth, int arcHeight) {
         handleRoundRect(x, y, width, height, arcWidth, arcHeight, true);
     }
+
     public void drawRoundRect(int x, int y, int width, int height, int arcWidth, int arcHeight) {
         handleRoundRect(x, y, width, height, arcWidth, arcHeight, false);
     }
+
     public void fillRect(int x, int y, int width, int height) {
         handleRoundRect(x, y, width, height, 0, 0, true);
     }
+
     public void drawRect(int x, int y, int width, int height) {
         handleRoundRect(x, y, width, height, 0, 0, false);
     }
+
     private void handleRoundRect(int x, int y, int width, int height, int arcWidth, int arcHeight, boolean fill) {
         Point2D p1 = transform.transform(new Point2D.Double(x, y), null);
         handleRoundRect(p1.getX(), p1.getY(), width, height, arcWidth, arcHeight, fill);
     }
+
     protected abstract void handleRoundRect(double x, double y, double width, double height, double arcWidth, double arcHeight, boolean fill);
 
     public void drawArc(int x, int y, int width, int height, int startAngle, int arcAngle) {
         handleArc(x, y, width, height, startAngle, arcAngle, false);
     }
+
     public void fillArc(int x, int y, int width, int height, int startAngle, int arcAngle) {
         handleArc(x, y, width, height, startAngle, arcAngle, true);
     }
+
     private void handleArc(int x, int y, int width, int height, int startAngle, int arcAngle, boolean fill) {
         Point2D p1 = transform.transform(new Point2D.Double(x, y), null);
         handleArc(p1.getX(), p1.getY(), width, height, startAngle, arcAngle, fill);
     }
+
     protected abstract void handleArc(double x, double y, double width, double height, int startAngle, int arcAngle, boolean fill);
 
     public void copyArea(int x, int y, int width, int height, int dx, int dy) {
@@ -207,6 +244,7 @@ public abstract class AbstractGraphicsInterface extends Graphics2D implements Cl
         Point2D p1 = transform.transform(new Point2D.Double(x, y), null);
         handleClearRect(p1.getX(), p1.getY(), width, height);
     }
+
     protected abstract void handleClearRect(double x, double y, double width, double height);
 
     public Color getBackground() {
@@ -230,16 +268,16 @@ public abstract class AbstractGraphicsInterface extends Graphics2D implements Cl
     }
 
     public void setPaint(Paint paint) {
-        if(paint instanceof Color)
-            setColor((Color)paint);
+        if (paint instanceof Color)
+            setColor((Color) paint);
         else
             return; /* TODO: implement this later! */
     }
 
     public void flush() {
-        if(closed)
+        if (closed)
             throw new IllegalStateException("This AbstractGraphicsInterface has already been closed!");
-        if(parent != null)
+        if (parent != null)
             return;
         flushInternal();
         children = new LinkedList<AbstractGraphicsInterface>();
@@ -284,8 +322,8 @@ public abstract class AbstractGraphicsInterface extends Graphics2D implements Cl
     }
 
     public void close() {
-        if(!closed) {
-            for(AbstractGraphicsInterface child : children)
+        if (!closed) {
+            for (AbstractGraphicsInterface child : children)
                 child.close();
             flush();
             closed = true;
@@ -337,30 +375,36 @@ public abstract class AbstractGraphicsInterface extends Graphics2D implements Cl
     }
 
     public void drawString(String s, int x, int y) {
-        drawString(s, (float)x, (float)y);
+        drawString(s, (float) x, (float) y);
     }
+
     public void drawString(String s, float x, float y) {
         Point2D p1 = transform.transform(new Point2D.Double(x, y), null);
         handleDrawString(s, p1.getX(), p1.getY());
     }
+
     public void drawString(AttributedCharacterIterator iterator, float x, float y) {
         StringBuffer s = new StringBuffer("");
-        for(char c = iterator.first(); c != CharacterIterator.DONE; c = iterator.next())
+        for (char c = iterator.first(); c != CharacterIterator.DONE; c = iterator.next())
             s.append(c);
         drawString(s.toString(), x, y);
     }
+
     public void drawString(AttributedCharacterIterator iterator, int x, int y) {
-        drawString(iterator, (float)x, (float)y);
+        drawString(iterator, (float) x, (float) y);
     }
+
     protected abstract void handleDrawString(String s, double x, double y);
 
     private static class Repainter implements Runnable {
         Component component;
         Graphics g;
+
         public Repainter(Component component, Graphics g) {
             this.component = component;
             this.g = g;
         }
+
         public void run() {
             //component.repaint();
             component.paint(g);
@@ -373,24 +417,26 @@ public abstract class AbstractGraphicsInterface extends Graphics2D implements Cl
         //component.paint(this);
         try {
             javax.swing.SwingUtilities.invokeAndWait(new Repainter(component, this));
-        } catch(Exception e) { }
+        } catch (Exception e) {
+        }
         javax.swing.RepaintManager.setCurrentManager(old);
     }
 
     public void drawRenderedImage(RenderedImage image, AffineTransform xform) {
         ColorModel c = image.getColorModel();
         Raster r = image.getData();
-        for(int x=0; x<image.getWidth(); x++) {
-            for(int y=0; y<image.getHeight(); y++) {
+        for (int x = 0; x < image.getWidth(); x++) {
+            for (int y = 0; y < image.getHeight(); y++) {
                 /* TODO: implement this later! */
             }
         }
     }
 
-    public void drawImage(BufferedImage image, BufferedImageOp op, int x, int y) { 
+    public void drawImage(BufferedImage image, BufferedImageOp op, int x, int y) {
         BufferedImage img1 = op.filter(image, null);
-        drawImage(img1, new AffineTransform(1f,0f,0f,1f,x,y), null);
+        drawImage(img1, new AffineTransform(1f, 0f, 0f, 1f, x, y), null);
     }
+
     public abstract boolean drawImage(Image img, AffineTransform xform, ImageObserver obs);
 
     public abstract void drawRenderableImage(RenderableImage img, AffineTransform xform);
@@ -400,8 +446,8 @@ public abstract class AbstractGraphicsInterface extends Graphics2D implements Cl
     }
 
     public void setStroke(Stroke stroke) {
-        if(stroke instanceof BasicStroke)
-            this.stroke = (BasicStroke)stroke;
+        if (stroke instanceof BasicStroke)
+            this.stroke = (BasicStroke) stroke;
         else
             return; /* TODO: implement this later! */
     }
@@ -411,7 +457,7 @@ public abstract class AbstractGraphicsInterface extends Graphics2D implements Cl
     }
 
     public void translate(int x, int y) {
-        translate((double)x, (double)y);
+        translate((double) x, (double) y);
     }
 
     public void translate(double tx, double ty) {
@@ -437,11 +483,11 @@ public abstract class AbstractGraphicsInterface extends Graphics2D implements Cl
     public RenderingHints getRenderingHints() {
         return new RenderingHints(hints);
     }
-    
+
     public void addRenderingHints(Map hints) {
         for (Object key : hints.keySet()) {
             if (key instanceof RenderingHints.Key) {
-                this.hints.put((RenderingHints.Key)key, hints.get(key));
+                this.hints.put((RenderingHints.Key) key, hints.get(key));
             }
         }
     }
@@ -467,13 +513,29 @@ public abstract class AbstractGraphicsInterface extends Graphics2D implements Cl
         /* TODO: implement this later! */
     }
 
-    public boolean drawImage(Image img, int x, int y, int width, int height, Color bgcolor, ImageObserver observer) { return true; }
-    public boolean drawImage(Image img, int x, int y, Color bgcolor, ImageObserver observer) { return true; }
-    public boolean drawImage(Image img, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, Color bgcolor, ImageObserver observer) { return true; }
-    public boolean drawImage(Image img, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, ImageObserver observer) { return true; }
-    public boolean drawImage(Image img, int x, int y, int width, int height, ImageObserver observer) { return true; }
-    public boolean drawImage(Image img, int x, int y, ImageObserver observer) { return true; }
-    
-    
-    
+    public boolean drawImage(Image img, int x, int y, int width, int height, Color bgcolor, ImageObserver observer) {
+        return true;
+    }
+
+    public boolean drawImage(Image img, int x, int y, Color bgcolor, ImageObserver observer) {
+        return true;
+    }
+
+    public boolean drawImage(Image img, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, Color bgcolor, ImageObserver observer) {
+        return true;
+    }
+
+    public boolean drawImage(Image img, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, ImageObserver observer) {
+        return true;
+    }
+
+    public boolean drawImage(Image img, int x, int y, int width, int height, ImageObserver observer) {
+        return true;
+    }
+
+    public boolean drawImage(Image img, int x, int y, ImageObserver observer) {
+        return true;
+    }
+
+
 }

@@ -6,6 +6,7 @@ import beast.evolution.tree.Tree;
 import org.jtikz.TikzGraphics2D;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -55,27 +56,45 @@ public class TikzTreeGrid extends beast.core.Runnable {
         int rSpacer = rowSpacer.get();
 
         int count = 0;
+
+        double x = 0;
+        double y = 0;
+        double w = width.get();
+        double h = height.get();
+        int s = strideLength.get();
+
+        Rectangle2D bounds;
+
         for (TreeDrawing drawing : treeDrawing.get()) {
 
             TreeComponent component = drawing.getComponent();
+            bounds = new Rectangle2D.Double(x, y, w, h);
 
-            component.setSize(new Dimension(width.get(), height.get()));
+            component.setBounds(bounds);
             if (oneScale.get()) component.rootHeightForScale = maxRootHeight;
+
+            g.setStroke(new BasicStroke(0.5f));
+            g.setColor(Color.gray);
+            g.draw(bounds);
+            g.drawString(count + "", (float) bounds.getX(), (float) bounds.getY());
 
             component.paint(g);
             count += 1;
             if (count % strideLength.get() == 0) {
                 // next stride
                 if (!isHorizontalStride.get()) {
-                    g.translate(height.get() + cSpacer, -(strideLength.get() - 1) * (width.get() + rSpacer));
+                    x += w + cSpacer;
+                    y -= (s - 1) * (h + rSpacer);
                 } else {
-                    g.translate(-(strideLength.get() - 1) * (height.get() + cSpacer), width.get() + rSpacer);
+                    x -= (s - 1) * (w + cSpacer);
+                    y += h + rSpacer;
                 }
             } else {
                 if (!isHorizontalStride.get()) {
-                    g.translate(0, width.get() + rSpacer);
+                    y += h + rSpacer;
+
                 } else {
-                    g.translate(height.get() + cSpacer, 0);
+                    x += w + cSpacer;
                 }
             }
         }
