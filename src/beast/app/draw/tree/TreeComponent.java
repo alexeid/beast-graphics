@@ -4,6 +4,7 @@ import beast.evolution.alignment.Alignment;
 import beast.evolution.alignment.Sequence;
 import beast.evolution.tree.Node;
 import beast.evolution.tree.Tree;
+import beast.evolution.tree.coalescent.IntervalType;
 import beast.evolution.tree.coalescent.TreeIntervals;
 import beast.util.TreeParser;
 import org.jtikz.TikzGraphics2D;
@@ -73,7 +74,11 @@ public class TreeComponent extends JComponent {
      * @return the position of this node in perpendicular to root-to-tip direction once scaled and labelOffset
      */
     double getNodePosition(Node node) {
-        return (Double) node.getMetaData("p");
+
+        Object o = node.getMetaData("p");
+        System.out.println(node + " position=" + o);
+
+        return (Double) o;
     }
 
     /**
@@ -227,15 +232,16 @@ public class TreeComponent extends JComponent {
         double height = getScaledOffsetNodeHeight(treeDrawing.getTree(), node.getHeight());
         double position = getNodePosition(node);
 
-        drawNode(node.getID(), height + treeDrawing.getLabelOffset(), position, TikzRenderingHints.VALUE_CENTER, TikzRenderingHints.VALUE_normalsize, g);
+        if (node.getID() != null)
+            drawNode(node.getID(), height + treeDrawing.getLabelOffset(), position, TikzRenderingHints.VALUE_CENTER, TikzRenderingHints.VALUE_normalsize, g);
     }
 
     void draw(TreeDrawing treeDrawing, Node node, Graphics2D g) {
 
         Tree tree = treeDrawing.getTree();
 
-        if (treeDrawing.showInternodeIntervals() && node.isRoot()) {
-            drawInternodeIntervals(treeDrawing.getTreeIntervals(), g);
+        if ((treeDrawing.showInternalNodeTimes() || treeDrawing.showLeafTimes()) && node.isRoot()) {
+            drawNodeTimes(treeDrawing.getTreeIntervals(), treeDrawing.showInternalNodeTimes(), treeDrawing.showLeafTimes(), g);
         }
 
         g.setStroke(new BasicStroke((float) treeDrawing.getLineThickness()));
@@ -246,8 +252,10 @@ public class TreeComponent extends JComponent {
             setTipValues(tree, node);
         }
 
-        if (node.isLeaf() && treeDrawing.showLeafNodes()) {
-            drawLabel(treeDrawing, node, g);
+        if (node.isLeaf()) {
+            if (treeDrawing.showLeafNodes()) {
+                drawLabel(treeDrawing, node, g);
+            }
         } else {
 
             double cp = 0;
@@ -306,13 +314,11 @@ public class TreeComponent extends JComponent {
         }
     }
 
-    private void drawInternodeIntervals(TreeIntervals treeIntervals, Graphics2D g) {
+    private void drawNodeTimes(TreeIntervals treeIntervals, boolean showInternalNodeTimes, boolean showLeafTimes, Graphics2D g) {
 
         Tree tree = treeIntervals.m_tree.get();
         Stroke s = g.getStroke();
         g.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10, new float[]{1.0f, 1.0f}, 0));
-
-        double[] intervals = treeIntervals.getIntervals(null);
 
         double unscaledHeight = 0.0;
 
@@ -320,16 +326,25 @@ public class TreeComponent extends JComponent {
         double p2 = getTotalSizeForNodeSpacing() - p1;
 
         String label = format.format(unscaledHeight);
+        IntervalType oldIntervalType = IntervalType.SAMPLE;
+        IntervalType newIntervalType;
 
-        drawInternodeInterval(label, getScaledOffsetNodeHeight(tree, unscaledHeight), p1, p2, g);
-        for (double interval : intervals) {
+        drawNodeTime(label, getScaledOffsetNodeHeight(tree, unscaledHeight), p1, p2, g);
+        for (int i = 0; i < treeIntervals.getIntervalCount(); i++) {
 
-            if (interval > 0.0) {
-                unscaledHeight += interval;
-                label = format.format(unscaledHeight);
-                double scaledHeight = getScaledOffsetNodeHeight(tree, unscaledHeight);
-                drawInternodeInterval(label, scaledHeight, p1, p2, g);
+            double interval = treeIntervals.getInterval(i);
+            newIntervalType = treeIntervals.getIntervalType(i);
+
+            unscaledHeight += interval;
+            if ((newIntervalType == IntervalType.SAMPLE && showLeafTimes) || (newIntervalType == IntervalType.COALESCENT && showInternalNodeTimes)) {
+
+                if (interval > 0.0 || (newIntervalType != oldIntervalType)) {
+                    label = format.format(unscaledHeight);
+                    double scaledHeight = getScaledOffsetNodeHeight(tree, unscaledHeight);
+                    drawNodeTime(label, scaledHeight, p1, p2, g);
+                }
             }
+            oldIntervalType = newIntervalType;
         }
         g.setStroke(s);
 
@@ -338,7 +353,7 @@ public class TreeComponent extends JComponent {
         }
     }
 
-    void drawInternodeInterval(String label, double scaledNodeHeight, double p1, double p2, Graphics2D g) {
+    void drawNodeTime(String label, double scaledNodeHeight, double p1, double p2, Graphics2D g) {
         draw(scaledNodeHeight, p1, scaledNodeHeight, p2, g);
         if (label != null)
             drawNode(label, scaledNodeHeight, p2, TikzRenderingHints.VALUE_NORTH, TikzRenderingHints.VALUE_scriptsize, g);

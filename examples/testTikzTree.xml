@@ -36,8 +36,8 @@
         </treeDrawing>
     </plate>
 
-    <run spec='beast.app.draw.tree.TikzTreeGrid' fileName="testTikzTree.tex" width="120" height="120" strideLength="3"
-         pdflatexPath="/usr/texbin/pdflatex">
+    <run spec='beast.app.draw.tree.TikzTreeGrid' fileName="testTikzTree.tex" width="120" height="120" oneScale="true"
+         strideLength="3" pdflatexPath="/usr/texbin/pdflatex">
         <plate var="n" range="1,2,3,4,5,6,7,8,9">
             <treeDrawing idref="treeDrawing$(n)"/>
         </plate>

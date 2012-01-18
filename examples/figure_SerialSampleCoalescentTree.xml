@@ -1,0 +1,49 @@
+<beast version='2.0'
+       namespace='beast.core:beast.evolution.alignment:beast.evolution.tree.coalescent:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood'>
+
+    <taxonset spec='TaxonSet' id='taxonset'>
+        <taxon spec='Taxon' id='A'/>
+        <taxon spec='Taxon' id='B'/>
+        <taxon spec='Taxon' id='C'/>
+        <taxon spec='Taxon' id='D'/>
+        <taxon spec='Taxon' id='E'/>
+        <taxon spec='Taxon' id='F'/>
+        <taxon spec='Taxon' id='G'/>
+        <taxon spec='Taxon' id='H'/>
+        <taxon spec='Taxon' id='I'/>
+    </taxonset>
+
+    <trait id='traitset' spec='beast.evolution.tree.TraitSet' traitname='date-forward' units='day'
+           value='
+		A  = 2,
+		B  = 2,
+		C  = 2,
+		D  = 1,
+		E  = 1,
+		F  = 1,
+        G  = 0,
+        H  = 0,
+        I  = 0'>
+        <taxa idref='taxonset'/>
+    </trait>
+
+    <treeDrawing spec='beast.app.draw.tree.TreeDrawing' id='treeDrawing' showLeafLabels="false" showLeafTimes="true"
+                 lineThickness="1" showInternalNodeTimes="false">
+        <!--leafTimeLabels="$t_0$\n$t_1$\n$t_2$" -->
+        <tree spec='beast.evolution.tree.RandomTree'>
+
+            <taxonset idref='taxonset'/>
+            <trait idref='traitset'/>
+
+            <populationModel spec='ConstantPopulation'>
+                <popSize spec='parameter.RealParameter' value='1'/>
+            </populationModel>
+        </tree>
+    </treeDrawing>
+
+    <run spec='beast.app.draw.tree.TikzTreeGrid' fileName="figure_SerialSampleCoalescentTree.tex" width="240" height="180" oneScale="false"
+         strideLength="3" pdflatexPath="/usr/texbin/pdflatex">
+            <treeDrawing idref="treeDrawing"/>
+    </run>
+</beast>
+

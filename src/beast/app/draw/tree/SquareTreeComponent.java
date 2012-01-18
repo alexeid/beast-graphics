@@ -34,6 +34,9 @@ public class SquareTreeComponent extends TreeComponent {
         double pos = getNodePosition(node);
         double childPos = getNodePosition(childNode);
 
+        System.out.println("height=" + height + ", childHeight=" + childHeight + ", pos=" + pos + ", childPos=" + childPos);
+
+        
         Path2D path = new GeneralPath();
         path.moveTo(childHeight, childPos);
         path.lineTo(height, childPos);

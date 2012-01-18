@@ -75,7 +75,7 @@ public class VerticalTreeComponent extends TreeComponent {
     }
 
     @Override
-    void drawInternodeInterval(String label, double scaledNodeHeight, double p1, double p2, Graphics2D g) {
+    void drawNodeTime(String label, double scaledNodeHeight, double p1, double p2, Graphics2D g) {
         draw(p1, scaledNodeHeight, p2, scaledNodeHeight, g);
         if (label != null)
             drawNode(label, p2, scaledNodeHeight, TikzRenderingHints.VALUE_WEST, TikzRenderingHints.VALUE_scriptsize, g);

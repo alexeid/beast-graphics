@@ -22,7 +22,8 @@ public class TreeDrawing extends Plugin {
     public Input<Double> labelOffsetInput = new Input<Double>("labelOffset", "indicates the distance from leaf node to its label in pts", 5.0);
     public Input<Boolean> showLeafLabelsInput = new Input<Boolean>("showLeafLabels", "if true then the taxa labels are displayed", true);
     public Input<String> branchLabelsInput = new Input<String>("branchLabels", "the attribute name of values to display on the branches, or empty string if no branch labels to be displayed", "");
-    public Input<Boolean> showInternodeIntervals = new Input<Boolean>("showInternodeIntervals", "if true then dotted lines at each internal node height are displayed", true);
+    public Input<Boolean> showInternalNodeTimes = new Input<Boolean>("showInternalNodeTimes", "if true then dotted lines are displayed at each internal node height.", false);
+    public Input<Boolean> showLeafTimes = new Input<Boolean>("showLeafTimes", "if true then dotted lines are displayed at each unique leaf height.", true);
     public Input<TreeDrawingStyle> treeDrawingStyleInput = new Input<TreeDrawingStyle>("style", "The drawing style for trees. Valid values are " +
             Arrays.toString(TreeDrawingStyle.values()) + " (default 'square')", TreeDrawingStyle.square, TreeDrawingStyle.values());
 
@@ -41,7 +42,7 @@ public class TreeDrawing extends Plugin {
     }
 
     public void initAndValidate() throws Exception {
-        if (showInternodeIntervals.get()) {
+        if (showInternalNodeTimes.get() || showLeafTimes.get()) {
             treeIntervals = new TreeIntervals(treeInput.get());
         }
         switch (treeDrawingStyleInput.get()) {
@@ -76,8 +77,12 @@ public class TreeDrawing extends Plugin {
         return labelOffsetInput.get();
     }
 
-    public boolean showInternodeIntervals() {
-        return showInternodeIntervals.get();
+    public boolean showInternalNodeTimes() {
+        return showInternalNodeTimes.get();
+    }
+
+    public boolean showLeafTimes() {
+        return showLeafTimes.get();
     }
 
     public boolean showLeafNodes() {
