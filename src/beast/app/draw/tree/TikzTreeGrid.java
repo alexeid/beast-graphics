@@ -28,6 +28,7 @@ public class TikzTreeGrid extends beast.core.Runnable {
     public Input<Integer> columnSpacer = new Input<Integer>("columnSpacer", "The space in points between columns", 10);
     public Input<Integer> rowSpacer = new Input<Integer>("rowSpacer", "The space in points between rows", 10);
     public Input<String> fileName = new Input<String>("fileName", "the name of the file to write Tikz code to", "");
+    public Input<Boolean> debug = new Input<Boolean>("debug", "if true then gray guidelines are drawn to assist debugging", false);
     public Input<String> pdflatexPath = new Input<String>("pdflatexPath", "the path to pdflatex; if provided then will be run automatically", "");
 
     /**
@@ -73,10 +74,12 @@ public class TikzTreeGrid extends beast.core.Runnable {
             component.setBounds(bounds);
             if (oneScale.get()) component.rootHeightForScale = maxRootHeight;
 
-            g.setStroke(new BasicStroke(0.5f));
-            g.setColor(Color.gray);
-            g.draw(bounds);
-            g.drawString(count + "", (float) bounds.getX(), (float) bounds.getY());
+            if (debug.get()) {
+                g.setStroke(new BasicStroke(0.5f));
+                g.setColor(Color.gray);
+                g.draw(bounds);
+                g.drawString(count + "", (float) bounds.getX(), (float) bounds.getY());
+            }
 
             component.paint(g);
             count += 1;

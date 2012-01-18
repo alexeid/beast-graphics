@@ -61,16 +61,16 @@ public class TreeDrawing extends Plugin {
         treeComponent = new TreeComponent(this, true);
         switch (treeOrientationInput.get()) {
             case up:
-                treeComponent.transform = TreeDrawingTransform.UP;
+                treeComponent.orientation = TreeDrawingOrientation.UP;
                 break;
             case down:
-                treeComponent.transform = TreeDrawingTransform.DOWN;
+                treeComponent.orientation = TreeDrawingOrientation.DOWN;
                 break;
             case left:
-                treeComponent.transform = TreeDrawingTransform.LEFT;
+                treeComponent.orientation = TreeDrawingOrientation.LEFT;
                 break;
             case right:
-                treeComponent.transform = TreeDrawingTransform.RIGHT;
+                treeComponent.orientation = TreeDrawingOrientation.RIGHT;
                 break;
         }
         treeComponent.setLeafShape(leafShapeInput.get());

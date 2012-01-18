@@ -10,7 +10,7 @@
         </taxonset>
         <input name='newick'>
             <![CDATA[
-            (D:3,((B:1,A:1):1,C:2):1);
+            (D:[&rate=1]4.5,((B:[&rate=1]1,A:[&rate=1.5]1):[&rate=1]2,C:[&rate=0.5]3):[&rate=0.5]1.5);
             ]]>
         </input>
     </tree>
@@ -18,14 +18,15 @@
 
     <plate var="n" range="up,right,down,left">
         <treeDrawing spec='beast.app.draw.tree.TreeDrawing' id='treeDrawing-$(n)' showLeafLabels="true"
-                     lineThickness="1.25" showLeafTimes="true" orientation='$(n)'>
+                     lineThickness="1.25" showLeafTimes="true" showInternalNodeTimes="true" branchLabels="&amp;rate"
+                     orientation='$(n)'>
             <tree idref='tree'/>
         </treeDrawing>
     </plate>
 
     <run spec='beast.app.draw.tree.TikzTreeGrid' fileName="testTikzTreeOrientation.tex" width="120" height="120"
          oneScale="false"
-         strideLength="2" columnSpacer="40" rowSpacer="30" pdflatexPath="/usr/texbin/pdflatex">
+         strideLength="2" columnSpacer="60" rowSpacer="60" pdflatexPath="/usr/texbin/pdflatex">
         <plate var="n" range="up,right,down,left">
             <treeDrawing idref="treeDrawing-$(n)"/>
         </plate>

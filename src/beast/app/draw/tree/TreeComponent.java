@@ -12,10 +12,7 @@ import org.jtikz.TikzRenderingHints;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Path2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.geom.*;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +23,7 @@ import java.util.List;
 public class TreeComponent extends JComponent {
 
     TreeDrawing treeDrawing;
-    TreeDrawingTransform transform = TreeDrawingTransform.UP;
+    TreeDrawingOrientation orientation = TreeDrawingOrientation.UP;
     BranchStyle branchStyle = BranchStyle.SQUARE;
 
     Tree tree;
@@ -37,16 +34,6 @@ public class TreeComponent extends JComponent {
     NumberFormat format = NumberFormat.getInstance();
 
     boolean isTriangle = true;
-
-    /**
-     * The scaling of the node heights. If the scale is 0 then scale is automatically calculated from component size
-     */
-    double nhs = 0;
-
-    /**
-     * The scaling of the spacing between the nodes (The number of pixels between adjacent tip nodes). If the spacing is 0 then it is automatically calculated from component size
-     */
-    double ns = 0;
 
     double rootHeightForScale;
     private boolean drawAxis = true;
@@ -63,73 +50,21 @@ public class TreeComponent extends JComponent {
      */
     public TreeComponent(TreeDrawing treeDrawing, boolean isTriangle) {
 
-        this(treeDrawing, 0, 0, isTriangle);
+        format.setMaximumFractionDigits(5);
+
+        //this.scalebar = scalebar;
+        this.isTriangle = isTriangle;
+
+        this.treeDrawing = treeDrawing;
+        this.tree = treeDrawing.getTree();
+
+        rootHeightForScale = treeDrawing.getTree().getRoot().getHeight();
 
     }
 
     public void setBounds(Rectangle2D bounds) {
         this.bounds = bounds;
         setSize((int) bounds.getWidth(), (int) bounds.getHeight());
-    }
-
-    public TreeComponent(TreeDrawing treeDrawing, double nodeHeightScale, double nodeSpacing, boolean isTriangle) {
-
-        format.setMaximumFractionDigits(5);
-
-        //this.scalebar = scalebar;
-        this.isTriangle = isTriangle;
-
-        this.nhs = nodeHeightScale;
-        this.ns = nodeSpacing;
-
-        this.treeDrawing = treeDrawing;
-        this.tree = treeDrawing.getTree();
-
-        rootHeightForScale = treeDrawing.getTree().getRoot().getHeight();
-    }
-
-    /**
-     * @param node the node
-     * @return the position of this node in perpendicular to root-to-tip direction once scaled and labelOffset
-     */
-    double getNodePosition(Node node) {
-
-        Object o = node.getMetaData("p");
-        System.out.println(node + " position=" + o);
-
-        return (Double) o;
-    }
-
-    /**
-     * @return the distance from edge of component to root when traveling towards the leaves
-     */
-    final double rootOffset() {
-        return 0.05 * getScaledTreeHeight();
-    }
-
-    /**
-     * @param tree
-     * @return the ratio of the available pixels for tree to the rootHeightForScale parameter
-     */
-    final double getNodeHeightScale(Tree tree) {
-
-        if (nhs == 0) return getScaledTreeHeight() / rootHeightForScale;
-        return nhs;
-    }
-
-    /**
-     * The total pixels available for the tree.
-     */
-    double getScaledTreeHeight() {
-        return 0.9 * getWidth();
-    }
-
-    /**
-     * @param unscaledNodeHeight the node height to scale
-     * @return the position of this node in root-to-tip direction once scaled and labelOffset for component
-     */
-    double getScaledOffsetNodeHeight(Tree tree, double unscaledNodeHeight) {
-        return getScaledTreeHeight() - unscaledNodeHeight * getNodeHeightScale(tree) + rootOffset();
     }
 
     void setTipValues(Tree tree, Node node) {
@@ -155,31 +90,6 @@ public class TreeComponent extends JComponent {
             node.setMetaData("pmax", pmax);
         }
     }
-
-//    void drawScaleBar(Tree tree, StringBuilder builder) {
-//
-//        double sby = y;// - nodeSpacing - 1;
-//        double width = scalebar.size * nodeHeightScale;
-//
-//        double sbx1 = (tree.getHeight(tree.getRootNode()) * nodeHeightScale + -width) / 2.0;
-//        double sbx2 = sbx1 + width;
-//
-//        double sbx3 = (sbx1 + sbx2) / 2;
-//
-//        draw(sbx1, sby, sbx2, sby, builder);
-//
-//        label(sbx3, sby + labelOffset, "" + scalebar.size, builder);
-//    }
-
-//    void label(double x, double y, String label, Object anchor, Graphics2D g) {
-//
-//        if (label != null) {
-//            Object oldHintValue = g.getRenderingHint(TikzRenderingHints.KEY_NODE_ANCHOR);
-//            g.setRenderingHint(TikzRenderingHints.KEY_NODE_ANCHOR, TikzRenderingHints.VALUE_CENTER);
-//            g.drawString(label, (float) x, (float) y);
-//            if (oldHintValue != null) g.setRenderingHint(TikzRenderingHints.KEY_NODE_ANCHOR, oldHintValue);
-//        }
-//    }
 
     void drawLeafNode(Point2D p, Graphics2D g) {
         Shape shape = null;
@@ -225,31 +135,39 @@ public class TreeComponent extends JComponent {
 
     }
 
-
     private boolean isDrawingBranchLabels(TreeDrawing treeDrawing) {
         return treeDrawing.getBranchLabels() != null && !treeDrawing.getBranchLabels().equals("");
     }
 
     private Point2D getCanonicalNodePoint2D(Node node) {
-        return new Point2D.Double(getCanonicalNodeX(node), node.getHeight() / node.getTree().getRoot().getHeight());
+        return new Point2D.Double(getCanonicalNodeX(node), getCanonicalNodeY(node.getTree(), node.getHeight()));
     }
 
     private double getCanonicalNodeX(Node node) {
         return (Double) node.getMetaData("p");
     }
 
+    private double getCanonicalNodeY(Tree tree, double height) {
+        return height / tree.getRoot().getHeight();
+    }
+
+
     private double getCanonicalNodeSpacing(Tree tree) {
         return 1.0 / (tree.getLeafNodeCount() - 1);
     }
 
     private Point2D getTransformedNodePoint2D(Node node) {
-        return transform.getTransform(bounds).transform(getCanonicalNodePoint2D(node), null);
+        return getTransformedPoint2D(getCanonicalNodePoint2D(node));
+    }
+
+    private Point2D getTransformedPoint2D(Point2D canonicalPoint2D) {
+        return orientation.getTransform(bounds).transform(canonicalPoint2D, null);
     }
 
     final void drawBranch(Node node, Node childNode, Graphics2D g) {
 
         Shape shape = branchStyle.getBranchShape(getCanonicalNodePoint2D(childNode), getCanonicalNodePoint2D(node));
-        Shape transformed = transform.getTransform(bounds).createTransformedShape(shape);
+        Shape transformed = orientation.getTransform(bounds).createTransformedShape(shape);
 
         g.draw(transformed);
     }
@@ -267,15 +185,16 @@ public class TreeComponent extends JComponent {
      */
     final void drawBranchLabel(String label, Tree tree, Node node, Node childNode, Object fontSize, Graphics2D g) {
 
-        //Point2D p = transform.getBranchLabelPoint2D(this, tree, node, childNode);
-        //drawString(label, p.getX(), p.getY(), transform.getBranchLabelAnchor(), fontSize, g);
+        Point2D p = getTransformedPoint2D(branchStyle.getCanonicalBranchLabelPoint2D(getCanonicalNodePoint2D(childNode), getCanonicalNodePoint2D(node)));
+
+        drawString(label, p.getX(), p.getY(), orientation.getBranchLabelAnchor(), fontSize, g);
     }
 
     final void drawLeafLabel(Node node, Graphics2D g) {
 
         Point2D nodePoint = getTransformedNodePoint2D(node);
 
-        drawString(node.getID(), nodePoint.getX(), nodePoint.getY(), transform.getLeafLabelAnchor(), TikzRenderingHints.VALUE_normalsize, g);
+        drawString(node.getID(), nodePoint.getX(), nodePoint.getY(), orientation.getLeafLabelAnchor(), TikzRenderingHints.VALUE_normalsize, g);
     }
 
     void draw(TreeDrawing treeDrawing, Node node, Graphics2D g) {
@@ -296,7 +215,7 @@ public class TreeComponent extends JComponent {
 
         if (node.isLeaf()) {
             if (treeDrawing.showLeafNodes()) {
-                //drawLeafNode(getTransformedNodePoint2D(node), g);
+                //drawLeafNode(getTransformedPoint2D(node), g);
                 drawLeafLabel(node, g);
             }
         } else {
@@ -362,14 +281,14 @@ public class TreeComponent extends JComponent {
 
         double unscaledHeight = 0.0;
 
-        double p1 = 0;
-        double p2 = 1;
+        double p1 = -0.1;
+        double p2 = 1.1;
 
         String label = format.format(unscaledHeight);
         IntervalType oldIntervalType = IntervalType.SAMPLE;
         IntervalType newIntervalType;
 
-        drawNodeTime(label, getScaledOffsetNodeHeight(tree, unscaledHeight), p1, p2, g);
+        drawNodeTime(label, getCanonicalNodeY(tree, unscaledHeight), p1, p2, g);
         for (int i = 0; i < treeIntervals.getIntervalCount(); i++) {
 
             double interval = treeIntervals.getInterval(i);
@@ -380,8 +299,7 @@ public class TreeComponent extends JComponent {
 
                 if (interval > 0.0 || (newIntervalType != oldIntervalType)) {
                     label = format.format(unscaledHeight);
-                    double scaledHeight = getScaledOffsetNodeHeight(tree, unscaledHeight);
-                    drawNodeTime(label, scaledHeight, p1, p2, g);
+                    drawNodeTime(label, getCanonicalNodeY(tree, unscaledHeight), p1, p2, g);
                 }
             }
             oldIntervalType = newIntervalType;
@@ -393,10 +311,12 @@ public class TreeComponent extends JComponent {
         }
     }
 
-    void drawNodeTime(String label, double scaledNodeHeight, double p1, double p2, Graphics2D g) {
-        //draw(scaledNodeHeight, p1, scaledNodeHeight, p2, g);
-        //if (label != null)
-        //    drawString(label, scaledNodeHeight, p2, TikzRenderingHints.VALUE_NORTH, TikzRenderingHints.VALUE_scriptsize, g);
+    void drawNodeTime(String label, double canonicalHeight, double pos1, double pos2, Graphics2D g) {
+        Point2D p1 = getTransformedPoint2D(new Point2D.Double(pos1, canonicalHeight));
+        Point2D p2 = getTransformedPoint2D(new Point2D.Double(pos2, canonicalHeight));
+
+        g.draw(new Line2D.Double(p1, p2));
+        drawString(label, p2.getX(), p2.getY(), orientation.getNodeHeightLabelAnchor(), TikzRenderingHints.VALUE_scriptsize, g);
     }
 
 
@@ -422,7 +342,7 @@ public class TreeComponent extends JComponent {
 
         Alignment alignment = new Alignment(sequences, 4, "nucleotide");
 
-        TreeComponent treeComponent = new SquareTreeComponent(new TreeDrawing(new TreeParser(alignment, newickTree)));
+        TreeComponent treeComponent = new TreeComponent(new TreeDrawing(new TreeParser(alignment, newickTree)), false);
 
         TikzGraphics2D tikzGraphics2D = new TikzGraphics2D();
         treeComponent.setSize(new Dimension(100, 100));
@@ -436,10 +356,6 @@ public class TreeComponent extends JComponent {
 //        frame.getContentPane().add(treeComponent, BorderLayout.CENTER);
 //        frame.setSize(new Dimension(800, 600));
 //        frame.setVisible(true);
-    }
-
-    public void setTreeHeightScaleFactor(double scaleFactor) {
-        nhs = scaleFactor;
     }
 
     public void setLeafShape(TreeDrawing.LeafShape leafShape) {

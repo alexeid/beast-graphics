@@ -8,15 +8,17 @@ import java.awt.geom.Rectangle2D;
 /**
  * @author Alexei Drummond
  */
-public interface TreeDrawingTransform {
+public interface TreeDrawingOrientation {
 
     AffineTransform getTransform(Rectangle2D bounds);
 
     Object getLeafLabelAnchor();
 
+    Object getNodeHeightLabelAnchor();
+
     Object getBranchLabelAnchor();
 
-    TreeDrawingTransform UP = new TreeDrawingTransform() {
+    TreeDrawingOrientation UP = new TreeDrawingOrientation() {
 
         @Override
         public AffineTransform getTransform(Rectangle2D bounds) {
@@ -38,12 +40,18 @@ public interface TreeDrawingTransform {
         }
 
         @Override
+        public Object getNodeHeightLabelAnchor() {
+            return TikzRenderingHints.VALUE_WEST;
+        }
+
+
+        @Override
         public Object getBranchLabelAnchor() {
             return TikzRenderingHints.VALUE_EAST;
         }
     };
 
-    TreeDrawingTransform RIGHT = new TreeDrawingTransform() {
+    TreeDrawingOrientation RIGHT = new TreeDrawingOrientation() {
 
         @Override
         public AffineTransform getTransform(Rectangle2D bounds) {
@@ -69,12 +77,17 @@ public interface TreeDrawingTransform {
         }
 
         @Override
+        public Object getNodeHeightLabelAnchor() {
+            return TikzRenderingHints.VALUE_NORTH;
+        }
+
+        @Override
         public Object getBranchLabelAnchor() {
             return TikzRenderingHints.VALUE_SOUTH;
         }
     };
 
-    TreeDrawingTransform LEFT = new TreeDrawingTransform() {
+    TreeDrawingOrientation LEFT = new TreeDrawingOrientation() {
         @Override
         public AffineTransform getTransform(Rectangle2D bounds) {
 
@@ -98,12 +111,17 @@ public interface TreeDrawingTransform {
         }
 
         @Override
+        public Object getNodeHeightLabelAnchor() {
+            return TikzRenderingHints.VALUE_NORTH;
+        }
+
+        @Override
         public Object getBranchLabelAnchor() {
             return TikzRenderingHints.VALUE_SOUTH;
         }
     };
 
-    TreeDrawingTransform DOWN = new TreeDrawingTransform() {
+    TreeDrawingOrientation DOWN = new TreeDrawingOrientation() {
 
         @Override
         public AffineTransform getTransform(Rectangle2D bounds) {
@@ -126,6 +144,11 @@ public interface TreeDrawingTransform {
         @Override
         public Object getLeafLabelAnchor() {
             return TikzRenderingHints.VALUE_NORTH;
+        }
+
+        @Override
+        public Object getNodeHeightLabelAnchor() {
+            return TikzRenderingHints.VALUE_WEST;
         }
 
         @Override

@@ -12,10 +12,18 @@ public interface BranchStyle {
 
     public Shape getBranchShape(Point2D canonicalChildPoint2D, Point2D canonicalParentPoint2D);
 
+    public Point2D getCanonicalBranchLabelPoint2D(Point2D canonicalChildPoint2D, Point2D canonicalParentPoint2D);
+
     BranchStyle LINE = new BranchStyle() {
         @Override
         public Shape getBranchShape(Point2D canonicalChildPoint2D, Point2D canonicalParentPoint2D) {
             return new Line2D.Double(canonicalChildPoint2D, canonicalParentPoint2D);
+        }
+
+        @Override
+        public Point2D getCanonicalBranchLabelPoint2D(Point2D canonicalChildPoint2D, Point2D canonicalParentPoint2D) {
+            return new Point2D.Double((canonicalChildPoint2D.getX() + canonicalParentPoint2D.getX()) / 2.0,
+                    (canonicalChildPoint2D.getY() + canonicalParentPoint2D.getY()) / 2.0);
         }
     };
 
@@ -27,6 +35,11 @@ public interface BranchStyle {
             path.lineTo(canonicalChildPoint2D.getX(), canonicalParentPoint2D.getY());
             path.lineTo(canonicalParentPoint2D.getX(), canonicalParentPoint2D.getY());
             return path;
+        }
+
+        @Override
+        public Point2D getCanonicalBranchLabelPoint2D(Point2D canonicalChildPoint2D, Point2D canonicalParentPoint2D) {
+            return new Point2D.Double(canonicalChildPoint2D.getX(), (canonicalChildPoint2D.getY() + canonicalParentPoint2D.getY()) / 2.0);
         }
     };
 }
