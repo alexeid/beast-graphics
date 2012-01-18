@@ -15,7 +15,6 @@
         </input>
     </tree>
 
-
     <plate var="n" range="up,right,down,left">
         <treeDrawing spec='beast.app.draw.tree.TreeDrawing' id='treeDrawing-$(n)' showLeafLabels="true"
                      lineThickness="1.25" showLeafTimes="true" showInternalNodeTimes="true" branchLabels="&amp;rate"
