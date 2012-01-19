@@ -65,8 +65,8 @@ public interface TreeDrawingOrientation {
             AffineTransform scale = AffineTransform.getScaleInstance(bounds.getWidth(), bounds.getHeight());
             AffineTransform finalTranslate = AffineTransform.getTranslateInstance(bounds.getMinX() + bounds.getWidth() / 2.0, bounds.getMinY() + bounds.getHeight() / 2.0);
 
-            finalTranslate.concatenate(rotation);
             finalTranslate.concatenate(scale);
+            finalTranslate.concatenate(rotation);
             finalTranslate.concatenate(translate);
             return finalTranslate;
         }

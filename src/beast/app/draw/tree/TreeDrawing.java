@@ -18,10 +18,7 @@ public class TreeDrawing extends Plugin {
 
     enum TreeOrientation {up, down, left, right}
 
-    enum TreeBranchStyle {triangle, square, vertical, unrooted}
-
-    enum LeafShape {circle, square, triangle}
-
+    enum TreeBranchStyle {line, square}
 
     public Input<Tree> treeInput = new Input<Tree>("tree", "a phylogenetic tree", Input.Validate.REQUIRED);
     public Input<Double> lineThicknessInput = new Input<Double>("lineThickness", "indicates the thickness of the lines", 1.0);
@@ -34,12 +31,10 @@ public class TreeDrawing extends Plugin {
             Arrays.toString(TreeOrientation.values()) + " (default 'right')", TreeOrientation.right, TreeOrientation.values());
     public Input<TreeBranchStyle> treeBranchStyleInput = new Input<TreeBranchStyle>("branchStyle", "The style to draw branches in. Valid values are " +
             Arrays.toString(TreeBranchStyle.values()) + " (default 'square')", TreeBranchStyle.square, TreeBranchStyle.values());
-    public Input<LeafShape> leafShapeInput = new Input<LeafShape>("leafShape", "The shape to draw leaf nodes. Valid values are " +
-            Arrays.toString(LeafShape.values()) + " (default 'square')", LeafShape.circle, LeafShape.values());
-    public Input<String> leafColorInput = new Input<String>("leafColor", "The color to draw the shape", "255,255,255");
-    public Input<Double> leafSizeInput = new Input<Double>("leafSize", "The size in points of the shape drawn at each leaf node", 5.0);
-
-
+    public Input<NodeDecorator> leafDecorator = new Input<NodeDecorator>("leafDecorator","options for how to draw the leaf nodes");
+    public Input<NodeDecorator> internalNodeDecorator = new Input<NodeDecorator>("internalNodeDecorator","options for how to draw the internal nodes");
+    public Input<String> leafTimeLabelsInput = new Input<String>("leafTimeLabels","labels for leaf times, comma-delimited");
+    
     private TreeIntervals treeIntervals;
     TreeComponent treeComponent;
 
@@ -58,7 +53,7 @@ public class TreeDrawing extends Plugin {
         if (showInternalNodeTimes.get() || showLeafTimes.get()) {
             treeIntervals = new TreeIntervals(treeInput.get());
         }
-        treeComponent = new TreeComponent(this, true);
+        treeComponent = new TreeComponent(this);
         switch (treeOrientationInput.get()) {
             case up:
                 treeComponent.orientation = TreeDrawingOrientation.UP;
@@ -73,17 +68,21 @@ public class TreeDrawing extends Plugin {
                 treeComponent.orientation = TreeDrawingOrientation.RIGHT;
                 break;
         }
-        treeComponent.setLeafShape(leafShapeInput.get());
 
-        String[] colorString = leafColorInput.get().split(",");
-        if (colorString.length != 3)
-            throw new Exception("The color string should be three values between 0-255 separated by commas");
-        int red = Integer.parseInt(colorString[0]);
-        int green = Integer.parseInt(colorString[0]);
-        int blue = Integer.parseInt(colorString[0]);
-        treeComponent.setLeafColor(new Color(red, green, blue));
-        treeComponent.setLeafSize(leafSizeInput.get());
-
+        switch (treeBranchStyleInput.get()) {
+            case square:
+                treeComponent.branchStyle = BranchStyle.SQUARE;
+                break;
+            case line:
+                treeComponent.branchStyle = BranchStyle.LINE;
+                break;
+        }
+        treeComponent.leafDecorator = leafDecorator.get();
+        treeComponent.internalNodeDecorator = internalNodeDecorator.get();
+        
+        String[] leafTimeLabels = leafTimeLabelsInput.get().split(",");
+        treeComponent.setLeafTimeLabels(leafTimeLabels);
+        
     }
 
     public Tree getTree() {

@@ -27,9 +27,13 @@
         <taxa idref='taxonset'/>
     </trait>
 
-    <treeDrawing spec='beast.app.draw.tree.TreeDrawing' id='treeDrawing' showLeafLabels="true" showLeafTimes="true"
-                 lineThickness="1" showInternalNodeTimes="false" leafShape="circle" leafColor="255,0,0" leafSize="5">
-        <!--leafTimeLabels="$t_0$\n$t_1$\n$t_2$" -->
+    <treeDrawing spec='beast.app.draw.tree.TreeDrawing' id='treeDrawing' orientation="right" showLeafLabels="false" showLeafTimes="true"
+                 lineThickness="1" showInternalNodeTimes="false" leafTimeLabels="$t_2$,$t_1$,$t_0$">
+        <!--leafTimeLabels="$t_0$,$t_1$,$t_2$" -->
+        <leafDecorator spec="beast.app.draw.tree.NodeDecorator" nodeShape="circle" nodeColor="255,255,0" nodeSize="4"/>
+        <internalNodeDecorator spec="beast.app.draw.tree.NodeDecorator" nodeShape="circle" nodeColor="255,0,0" nodeSize="4"/>
+
+
         <tree spec='beast.evolution.tree.RandomTree'>
 
             <taxonset idref='taxonset'/>
@@ -41,9 +45,8 @@
         </tree>
     </treeDrawing>
 
-    <run spec='beast.app.draw.tree.TikzTreeGrid' fileName="figure_SerialSampleCoalescentTree.tex" width="240"
-         height="180" oneScale="false"
-         strideLength="3" pdflatexPath="/usr/texbin/pdflatex">
+    <run spec='beast.app.draw.tree.TikzTreeGrid' fileName="figure_SerialSampleCoalescentTree.tex" width="320"
+         height="180" debug="false" pdflatexPath="/usr/texbin/pdflatex">
         <treeDrawing idref="treeDrawing"/>
     </run>
 </beast>

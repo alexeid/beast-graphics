@@ -25,6 +25,8 @@ public class TreeComponent extends JComponent {
     TreeDrawing treeDrawing;
     TreeDrawingOrientation orientation = TreeDrawingOrientation.UP;
     BranchStyle branchStyle = BranchStyle.SQUARE;
+    NodeDecorator leafDecorator, internalNodeDecorator;
+    NodePositioningRule positioningRule = NodePositioningRule.AVERAGE_OF_CHILDREN;
 
     Tree tree;
 
@@ -33,27 +35,21 @@ public class TreeComponent extends JComponent {
 
     NumberFormat format = NumberFormat.getInstance();
 
-    boolean isTriangle = true;
-
     double rootHeightForScale;
     private boolean drawAxis = true;
 
-    private TreeDrawing.LeafShape leafShape;
-    private double leafSize = 4;
-    private Color leafColor = Color.white;
-
     private Rectangle2D bounds = new Rectangle2D.Double(0, 0, 1, 1);
+    private String[] leafTimeLabels;
 
     /**
      * @param treeDrawing the  tree drawing
-     * @param isTriangle  true if tree should be drawn so that outside branches form a triangle on ultrametric trees
      */
-    public TreeComponent(TreeDrawing treeDrawing, boolean isTriangle) {
+    public TreeComponent(TreeDrawing treeDrawing) {
 
         format.setMaximumFractionDigits(5);
 
         //this.scalebar = scalebar;
-        this.isTriangle = isTriangle;
+        //this.isTriangle = isTriangle;
 
         this.treeDrawing = treeDrawing;
         this.tree = treeDrawing.getTree();
@@ -74,33 +70,42 @@ public class TreeComponent extends JComponent {
             node.setMetaData("pmax", p);
             p += getCanonicalNodeSpacing(tree);
         } else {
-
-            double pmin = Double.MAX_VALUE;
-            double pmax = Double.MIN_VALUE;
-            for (Node childNode : node.getChildren()) {
-                setTipValues(tree, childNode);
-
-                double cpmin = (Double) childNode.getMetaData("pmin");
-                double cpmax = (Double) childNode.getMetaData("pmax");
-
-                if (cpmin < pmin) pmin = cpmin;
-                if (cpmax > pmax) pmax = cpmax;
+            for (Node child : node.getChildren()) {
+                setTipValues(tree, child);
             }
-            node.setMetaData("pmin", pmin);
-            node.setMetaData("pmax", pmax);
+
+            System.out.println(node.getMetaData("p"));
+            positioningRule.setPosition(node, "p");
+
+//            double pmin = Double.MAX_VALUE;
+//            double pmax = Double.MIN_VALUE;
+//            for (Node childNode : node.getChildren()) {
+//                setTipValues(tree, childNode);
+//
+//                double cpmin = (Double) childNode.getMetaData("pmin");
+//                double cpmax = (Double) childNode.getMetaData("pmax");
+//
+//                if (cpmin < pmin) pmin = cpmin;
+//                if (cpmax > pmax) pmax = cpmax;
+//            }
+//            node.setMetaData("pmin", pmin);
+//            node.setMetaData("pmax", pmax);
         }
     }
 
-    void drawLeafNode(Point2D p, Graphics2D g) {
-        Shape shape = null;
-        double halfSize = leafSize / 2.0;
+    void drawNode(Point2D p, Graphics2D g, NodeDecorator decorator) {
 
-        switch (leafShape) {
+        double nodeSize = decorator.getNodeSize();
+
+        Shape shape = null;
+        double halfSize = nodeSize / 2.0;
+
+        switch (decorator.getNodeShape()) {
             case circle:
-                shape = new Ellipse2D.Double(p.getX() - halfSize, p.getY() - halfSize, leafSize, leafSize);
+                shape = new Ellipse2D.Double(p.getX() - halfSize, p.getY() - halfSize, nodeSize, nodeSize);
                 break;
             case square:
-                shape = new Rectangle2D.Double(p.getX() - halfSize, p.getY() - halfSize, leafSize, leafSize);
+                shape = new Rectangle2D.Double(p.getX() - halfSize, p.getY() - halfSize, nodeSize, nodeSize);
                 break;
             case triangle:
                 Path2D path = new Path2D.Double();
@@ -112,7 +117,7 @@ public class TreeComponent extends JComponent {
             default:
         }
         Color oldColor = g.getColor();
-        g.setColor(leafColor);
+        g.setColor(decorator.getNodeColor());
         g.fill(shape);
         g.setColor(oldColor);
         g.draw(shape);
@@ -150,7 +155,6 @@ public class TreeComponent extends JComponent {
     private double getCanonicalNodeY(Tree tree, double height) {
         return height / tree.getRoot().getHeight();
     }
-
 
     private double getCanonicalNodeSpacing(Tree tree) {
         return 1.0 / (tree.getLeafNodeCount() - 1);
@@ -197,6 +201,13 @@ public class TreeComponent extends JComponent {
         drawString(node.getID(), nodePoint.getX(), nodePoint.getY(), orientation.getLeafLabelAnchor(), TikzRenderingHints.VALUE_normalsize, g);
     }
 
+    /**
+     * Draws the tree
+     *
+     * @param treeDrawing
+     * @param node
+     * @param g
+     */
     void draw(TreeDrawing treeDrawing, Node node, Graphics2D g) {
 
         Tree tree = treeDrawing.getTree();
@@ -215,37 +226,36 @@ public class TreeComponent extends JComponent {
 
         if (node.isLeaf()) {
             if (treeDrawing.showLeafNodes()) {
-                //drawLeafNode(getTransformedPoint2D(node), g);
                 drawLeafLabel(node, g);
             }
         } else {
 
             double cp = 0;
-            if (isTriangle) {
-                if (node.isRoot()) {
-                    cp = 0.5;
-                } else {
-
-                    Node parent = node.getParent();
-
-                    double pp = (Double) parent.getMetaData("p");
-                    double ph = parent.getHeight();
-                    double h = node.getHeight();
-
-                    double pmin = (Double) node.getMetaData("pmin");
-                    double pmax = (Double) node.getMetaData("pmax");
-
-                    double pminDist = Math.abs(pp - pmin);
-                    double pmaxDist = Math.abs(pp - pmax);
-
-                    if (pminDist > pmaxDist) {
-                        cp = ((pp * h) + (pmin * (ph - h))) / ph;
-                    } else {
-                        cp = ((pp * h) + (pmax * (ph - h))) / ph;
-                    }
-                }
-                node.setMetaData("p", cp);
-            }
+//            if (isTriangle) {
+//                if (node.isRoot()) {
+//                    cp = 0.5;
+//                } else {
+//
+//                    Node parent = node.getParent();
+//
+//                    double pp = (Double) parent.getMetaData("p");
+//                    double ph = parent.getHeight();
+//                    double h = node.getHeight();
+//
+//                    double pmin = (Double) node.getMetaData("pmin");
+//                    double pmax = (Double) node.getMetaData("pmax");
+//
+//                    double pminDist = Math.abs(pp - pmin);
+//                    double pmaxDist = Math.abs(pp - pmax);
+//
+//                    if (pminDist > pmaxDist) {
+//                        cp = ((pp * h) + (pmin * (ph - h))) / ph;
+//                    } else {
+//                        cp = ((pp * h) + (pmax * (ph - h))) / ph;
+//                    }
+//                }
+//                node.setMetaData("p", cp);
+//            }
 
             int count = 0;
             for (Node childNode : node.getChildren()) {
@@ -254,7 +264,7 @@ public class TreeComponent extends JComponent {
                 count += 1;
             }
             cp /= count;
-            if (!isTriangle) node.setMetaData("p", cp);
+            //if (!isTriangle) node.setMetaData("p", cp);
 
             for (Node childNode : node.getChildren()) {
 
@@ -268,6 +278,22 @@ public class TreeComponent extends JComponent {
                         branchLabel = metaData.toString();
                     }
                     drawBranchLabel(branchLabel, tree, node, childNode, TikzRenderingHints.VALUE_scriptsize, g);
+                }
+            }
+        }
+
+        // finally draw all the node decorations
+        if (node.isRoot()) {
+            if (leafDecorator != null) {
+                List<Node> nodes = tree.getExternalNodes();
+                for (Node leaf : nodes) {
+                    drawNode(getTransformedPoint2D(getCanonicalNodePoint2D(leaf)), g, leafDecorator);
+                }
+            }
+            if (internalNodeDecorator != null) {
+                List<Node> internalNodes = tree.getInternalNodes();
+                for (Node internalNode : internalNodes) {
+                    drawNode(getTransformedPoint2D(getCanonicalNodePoint2D(internalNode)), g, internalNodeDecorator);
                 }
             }
         }
@@ -287,6 +313,11 @@ public class TreeComponent extends JComponent {
         String label = format.format(unscaledHeight);
         IntervalType oldIntervalType = IntervalType.SAMPLE;
         IntervalType newIntervalType;
+        int leafLabelIndex = 0;
+        if (leafTimeLabels != null) {
+            label = leafTimeLabels[leafLabelIndex];
+            leafLabelIndex += 1;
+        }
 
         drawNodeTime(label, getCanonicalNodeY(tree, unscaledHeight), p1, p2, g);
         for (int i = 0; i < treeIntervals.getIntervalCount(); i++) {
@@ -299,7 +330,12 @@ public class TreeComponent extends JComponent {
 
                 if (interval > 0.0 || (newIntervalType != oldIntervalType)) {
                     label = format.format(unscaledHeight);
+                    if (newIntervalType == IntervalType.SAMPLE && leafTimeLabels != null) {
+                        label = leafTimeLabels[leafLabelIndex];
+                        leafLabelIndex += 1;
+                    }
                     drawNodeTime(label, getCanonicalNodeY(tree, unscaledHeight), p1, p2, g);
+
                 }
             }
             oldIntervalType = newIntervalType;
@@ -342,7 +378,7 @@ public class TreeComponent extends JComponent {
 
         Alignment alignment = new Alignment(sequences, 4, "nucleotide");
 
-        TreeComponent treeComponent = new TreeComponent(new TreeDrawing(new TreeParser(alignment, newickTree)), false);
+        TreeComponent treeComponent = new TreeComponent(new TreeDrawing(new TreeParser(alignment, newickTree)));
 
         TikzGraphics2D tikzGraphics2D = new TikzGraphics2D();
         treeComponent.setSize(new Dimension(100, 100));
@@ -358,16 +394,12 @@ public class TreeComponent extends JComponent {
 //        frame.setVisible(true);
     }
 
-    public void setLeafShape(TreeDrawing.LeafShape leafShape) {
-        this.leafShape = leafShape;
-    }
-
-    public void setLeafColor(Color color) {
-        leafColor = color;
-    }
-
-    public void setLeafSize(double leafSize) {
-        this.leafSize = leafSize;
+    public void setLeafTimeLabels(String[] leafTimeLabels) {
+        System.out.println("leaf time labels set to:");
+        for (String label: leafTimeLabels) {
+            System.out.println("  " + label);
+        }
+        this.leafTimeLabels = leafTimeLabels;
     }
 }
 
