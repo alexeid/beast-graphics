@@ -4,9 +4,9 @@ import beast.core.Description;
 import beast.core.Input;
 import beast.core.Plugin;
 import beast.evolution.tree.Tree;
+import beast.evolution.tree.TreeUtils;
 import beast.evolution.tree.coalescent.TreeIntervals;
 
-import java.awt.*;
 import java.util.Arrays;
 
 /**
@@ -20,6 +20,8 @@ public class TreeDrawing extends Plugin {
 
     enum TreeBranchStyle {line, square}
 
+    enum FontSize {normalsize, footnotesize, scriptsize}
+
     public Input<Tree> treeInput = new Input<Tree>("tree", "a phylogenetic tree", Input.Validate.REQUIRED);
     public Input<Double> lineThicknessInput = new Input<Double>("lineThickness", "indicates the thickness of the lines", 1.0);
     public Input<Double> labelOffsetInput = new Input<Double>("labelOffset", "indicates the distance from leaf node to its label in pts", 5.0);
@@ -31,10 +33,14 @@ public class TreeDrawing extends Plugin {
             Arrays.toString(TreeOrientation.values()) + " (default 'right')", TreeOrientation.right, TreeOrientation.values());
     public Input<TreeBranchStyle> treeBranchStyleInput = new Input<TreeBranchStyle>("branchStyle", "The style to draw branches in. Valid values are " +
             Arrays.toString(TreeBranchStyle.values()) + " (default 'square')", TreeBranchStyle.square, TreeBranchStyle.values());
-    public Input<NodeDecorator> leafDecorator = new Input<NodeDecorator>("leafDecorator","options for how to draw the leaf nodes");
-    public Input<NodeDecorator> internalNodeDecorator = new Input<NodeDecorator>("internalNodeDecorator","options for how to draw the internal nodes");
-    public Input<String> leafTimeLabelsInput = new Input<String>("leafTimeLabels","labels for leaf times, comma-delimited");
-    
+    public Input<NodeDecorator> leafDecorator = new Input<NodeDecorator>("leafDecorator", "options for how to draw the leaf nodes");
+    public Input<NodeDecorator> internalNodeDecorator = new Input<NodeDecorator>("internalNodeDecorator", "options for how to draw the internal nodes");
+    public Input<String> leafTimeLabelsInput = new Input<String>("leafTimeLabels", "labels for leaf times, comma-delimited");
+    public Input<FontSize> leafTimeLabelsFontSizeInput =
+            new Input<FontSize>("leafTimeLabelsFontSize", "font size of leaf time labels. Valid values are " +
+                    Arrays.toString(FontSize.values()), FontSize.normalsize, FontSize.values());
+    public Input<Boolean> rotateTreeInput = new Input<Boolean>("rotateTree", "if true then tree nodes are rotated by node density", false);
+
     private TreeIntervals treeIntervals;
     TreeComponent treeComponent;
 
@@ -79,10 +85,16 @@ public class TreeDrawing extends Plugin {
         }
         treeComponent.leafDecorator = leafDecorator.get();
         treeComponent.internalNodeDecorator = internalNodeDecorator.get();
-        
-        String[] leafTimeLabels = leafTimeLabelsInput.get().split(",");
-        treeComponent.setLeafTimeLabels(leafTimeLabels);
-        
+
+        if (leafTimeLabelsInput.get() != null) {
+            String[] leafTimeLabels = leafTimeLabelsInput.get().split(",");
+            treeComponent.setLeafTimeLabels(leafTimeLabels);
+        }
+        treeComponent.setLeafTimeLabelFontSize(leafTimeLabelsFontSizeInput.get());
+
+        if (rotateTreeInput.get()) {
+            TreeUtils.rotateNodeByComparator(treeComponent.tree.getRoot(), TreeUtils.createNodeDensityMinNodeHeightComparator());
+        }
     }
 
     public Tree getTree() {

@@ -1,6 +1,10 @@
 <beast version='2.0'
        namespace='beast.core:beast.evolution.alignment:beast.evolution.tree.coalescent:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood'>
 
+    <!-- figure 1.4 for Beast 2 book -->
+
+    <!-- seed should be set to 5 -->
+
     <taxonset spec='TaxonSet' id='taxonset'>
         <taxon spec='Taxon' id='A'/>
         <taxon spec='Taxon' id='B'/>
@@ -27,11 +31,13 @@
         <taxa idref='taxonset'/>
     </trait>
 
-    <treeDrawing spec='beast.app.draw.tree.TreeDrawing' id='treeDrawing' orientation="right" showLeafLabels="false" showLeafTimes="true"
-                 lineThickness="1" showInternalNodeTimes="false" leafTimeLabels="$t_2$,$t_1$,$t_0$">
-        <!--leafTimeLabels="$t_0$,$t_1$,$t_2$" -->
+    <treeDrawing spec='beast.app.draw.tree.TreeDrawing' id='treeDrawing' orientation="right" showLeafLabels="false"
+                 showLeafTimes="true"
+                 lineThickness="1" showInternalNodeTimes="false" leafTimeLabels="$t_0$,$t_1$,$t_2$"
+                 leafTimeLabelsFontSize="normalsize" rotateTree="true">
         <leafDecorator spec="beast.app.draw.tree.NodeDecorator" nodeShape="circle" nodeColor="255,255,0" nodeSize="4"/>
-        <internalNodeDecorator spec="beast.app.draw.tree.NodeDecorator" nodeShape="circle" nodeColor="255,0,0" nodeSize="4"/>
+        <internalNodeDecorator spec="beast.app.draw.tree.NodeDecorator" nodeShape="circle" nodeColor="255,0,0"
+                               nodeSize="4"/>
 
 
         <tree spec='beast.evolution.tree.RandomTree'>
@@ -40,7 +46,7 @@
             <trait idref='traitset'/>
 
             <populationModel spec='ConstantPopulation'>
-                <popSize spec='parameter.RealParameter' value='1'/>
+                <popSize spec='parameter.RealParameter' value='1.33'/>
             </populationModel>
         </tree>
     </treeDrawing>

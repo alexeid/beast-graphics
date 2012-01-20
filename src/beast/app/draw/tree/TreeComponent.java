@@ -40,6 +40,7 @@ public class TreeComponent extends JComponent {
 
     private Rectangle2D bounds = new Rectangle2D.Double(0, 0, 1, 1);
     private String[] leafTimeLabels;
+    private TreeDrawing.FontSize leafTimeLabelsFontSize = TreeDrawing.FontSize.normalsize;
 
     /**
      * @param treeDrawing the  tree drawing
@@ -352,7 +353,20 @@ public class TreeComponent extends JComponent {
         Point2D p2 = getTransformedPoint2D(new Point2D.Double(pos2, canonicalHeight));
 
         g.draw(new Line2D.Double(p1, p2));
-        drawString(label, p2.getX(), p2.getY(), orientation.getNodeHeightLabelAnchor(), TikzRenderingHints.VALUE_scriptsize, g);
+        drawString(label, p2.getX(), p2.getY(), orientation.getNodeHeightLabelAnchor(),
+                getTikzRenderingHintFontSize(leafTimeLabelsFontSize), g);
+    }
+
+    private Object getTikzRenderingHintFontSize(TreeDrawing.FontSize fontSize) {
+        switch (fontSize) {
+            case scriptsize:
+                return TikzRenderingHints.VALUE_scriptsize;
+            case footnotesize:
+                return TikzRenderingHints.VALUE_footnotesize;
+            case normalsize:
+            default:
+                return TikzRenderingHints.VALUE_normalsize;
+        }
     }
 
 
@@ -396,10 +410,14 @@ public class TreeComponent extends JComponent {
 
     public void setLeafTimeLabels(String[] leafTimeLabels) {
         System.out.println("leaf time labels set to:");
-        for (String label: leafTimeLabels) {
+        for (String label : leafTimeLabels) {
             System.out.println("  " + label);
         }
         this.leafTimeLabels = leafTimeLabels;
+    }
+
+    public void setLeafTimeLabelFontSize(TreeDrawing.FontSize fontSize) {
+        this.leafTimeLabelsFontSize = fontSize;
     }
 }
 
