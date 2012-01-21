@@ -22,6 +22,8 @@ public class TreeDrawing extends Plugin {
 
     enum FontSize {normalsize, footnotesize, scriptsize}
 
+    enum NodePosition {average, triangulated}
+
     public Input<Tree> treeInput = new Input<Tree>("tree", "a phylogenetic tree", Input.Validate.REQUIRED);
     public Input<Double> lineThicknessInput = new Input<Double>("lineThickness", "indicates the thickness of the lines", 1.0);
     public Input<Double> labelOffsetInput = new Input<Double>("labelOffset", "indicates the distance from leaf node to its label in pts", 5.0);
@@ -34,12 +36,16 @@ public class TreeDrawing extends Plugin {
     public Input<TreeBranchStyle> treeBranchStyleInput = new Input<TreeBranchStyle>("branchStyle", "The style to draw branches in. Valid values are " +
             Arrays.toString(TreeBranchStyle.values()) + " (default 'square')", TreeBranchStyle.square, TreeBranchStyle.values());
     public Input<NodeDecorator> leafDecorator = new Input<NodeDecorator>("leafDecorator", "options for how to draw the leaf nodes");
+    public Input<NodePosition> nodePositionInput = new Input<NodePosition>("nodePositioning", "option for node positioning. Valid values are " +
+            Arrays.toString(NodePosition.values()) + " (default 'average')", NodePosition.average, NodePosition.values());
+
     public Input<NodeDecorator> internalNodeDecorator = new Input<NodeDecorator>("internalNodeDecorator", "options for how to draw the internal nodes");
     public Input<String> leafTimeLabelsInput = new Input<String>("leafTimeLabels", "labels for leaf times, comma-delimited");
     public Input<FontSize> leafTimeLabelsFontSizeInput =
             new Input<FontSize>("leafTimeLabelsFontSize", "font size of leaf time labels. Valid values are " +
                     Arrays.toString(FontSize.values()), FontSize.normalsize, FontSize.values());
     public Input<Boolean> rotateTreeInput = new Input<Boolean>("rotateTree", "if true then tree nodes are rotated by node density", false);
+    public Input<String> captionInput = new Input<String>("caption", "caption for tree figure", "");
 
     private TreeIntervals treeIntervals;
     TreeComponent treeComponent;
@@ -83,6 +89,16 @@ public class TreeDrawing extends Plugin {
                 treeComponent.branchStyle = BranchStyle.LINE;
                 break;
         }
+
+        switch (nodePositionInput.get()) {
+            case average:
+                treeComponent.positioningRule = NodePositioningRule.AVERAGE_OF_CHILDREN;
+                break;
+            case triangulated:
+                treeComponent.positioningRule = NodePositioningRule.TRIANGULATED;
+                break;
+        }
+
         treeComponent.leafDecorator = leafDecorator.get();
         treeComponent.internalNodeDecorator = internalNodeDecorator.get();
 
@@ -94,6 +110,11 @@ public class TreeDrawing extends Plugin {
 
         if (rotateTreeInput.get()) {
             TreeUtils.rotateNodeByComparator(treeComponent.tree.getRoot(), TreeUtils.createNodeDensityMinNodeHeightComparator());
+        }
+
+        String caption = captionInput.get();
+        if (caption != null && !caption.equals("")) {
+            treeComponent.setCaption(caption);
         }
     }
 

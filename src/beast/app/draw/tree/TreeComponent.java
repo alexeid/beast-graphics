@@ -27,6 +27,7 @@ public class TreeComponent extends JComponent {
     BranchStyle branchStyle = BranchStyle.SQUARE;
     NodeDecorator leafDecorator, internalNodeDecorator;
     NodePositioningRule positioningRule = NodePositioningRule.AVERAGE_OF_CHILDREN;
+    String caption = null;
 
     Tree tree;
 
@@ -64,33 +65,35 @@ public class TreeComponent extends JComponent {
         setSize((int) bounds.getWidth(), (int) bounds.getHeight());
     }
 
-    void setTipValues(Tree tree, Node node) {
+    void setTipValues(Node node) {
         if (node.isLeaf()) {
             node.setMetaData("p", p);
-            node.setMetaData("pmin", p);
-            node.setMetaData("pmax", p);
-            p += getCanonicalNodeSpacing(tree);
+            node.setMetaData("p_min", p);
+            node.setMetaData("p_max", p);
+            p += getCanonicalNodeSpacing(node.getTree());
         } else {
-            for (Node child : node.getChildren()) {
-                setTipValues(tree, child);
+            double pmin = Double.MAX_VALUE;
+            double pmax = Double.MIN_VALUE;
+            for (Node childNode : node.getChildren()) {
+                setTipValues(childNode);
+
+                double cpmin = (Double) childNode.getMetaData("p_min");
+                double cpmax = (Double) childNode.getMetaData("p_max");
+
+                if (cpmin < pmin) pmin = cpmin;
+                if (cpmax > pmax) pmax = cpmax;
             }
+            node.setMetaData("p_min", pmin);
+            node.setMetaData("p_max", pmax);
+        }
+    }
 
-            System.out.println(node.getMetaData("p"));
+    void positionInternalNodes(Node node) {
+        if (!node.isLeaf()) {
             positioningRule.setPosition(node, "p");
-
-//            double pmin = Double.MAX_VALUE;
-//            double pmax = Double.MIN_VALUE;
-//            for (Node childNode : node.getChildren()) {
-//                setTipValues(tree, childNode);
-//
-//                double cpmin = (Double) childNode.getMetaData("pmin");
-//                double cpmax = (Double) childNode.getMetaData("pmax");
-//
-//                if (cpmin < pmin) pmin = cpmin;
-//                if (cpmax > pmax) pmax = cpmax;
-//            }
-//            node.setMetaData("pmin", pmin);
-//            node.setMetaData("pmax", pmax);
+            for (Node child : node.getChildren()) {
+                positionInternalNodes(child);
+            }
         }
     }
 
@@ -124,6 +127,13 @@ public class TreeComponent extends JComponent {
         g.draw(shape);
 
         //g.setFont(oldFont);
+    }
+
+    void drawCanonicalString(String string, double x, double y, Object anchor, Object fontSize, Graphics2D g) {
+
+        Point2D p = getTransformedPoint2D(new Point2D.Double(x, y));
+
+        drawString(string, p.getX(), p.getY(), anchor, fontSize, g);
     }
 
     void drawString(String string, double x, double y, Object anchor, Object fontSize, Graphics2D g) {
@@ -222,7 +232,8 @@ public class TreeComponent extends JComponent {
         p = 0.0; // canonical positioning goes from 0 to 1.
 
         if (node.isRoot()) {
-            setTipValues(tree, node);
+            setTipValues(node);
+            positionInternalNodes(node);
         }
 
         if (node.isLeaf()) {
@@ -231,41 +242,9 @@ public class TreeComponent extends JComponent {
             }
         } else {
 
-            double cp = 0;
-//            if (isTriangle) {
-//                if (node.isRoot()) {
-//                    cp = 0.5;
-//                } else {
-//
-//                    Node parent = node.getParent();
-//
-//                    double pp = (Double) parent.getMetaData("p");
-//                    double ph = parent.getHeight();
-//                    double h = node.getHeight();
-//
-//                    double pmin = (Double) node.getMetaData("pmin");
-//                    double pmax = (Double) node.getMetaData("pmax");
-//
-//                    double pminDist = Math.abs(pp - pmin);
-//                    double pmaxDist = Math.abs(pp - pmax);
-//
-//                    if (pminDist > pmaxDist) {
-//                        cp = ((pp * h) + (pmin * (ph - h))) / ph;
-//                    } else {
-//                        cp = ((pp * h) + (pmax * (ph - h))) / ph;
-//                    }
-//                }
-//                node.setMetaData("p", cp);
-//            }
-
-            int count = 0;
             for (Node childNode : node.getChildren()) {
                 draw(treeDrawing, childNode, g);
-                cp += (Double) childNode.getMetaData("p");
-                count += 1;
             }
-            cp /= count;
-            //if (!isTriangle) node.setMetaData("p", cp);
 
             for (Node childNode : node.getChildren()) {
 
@@ -377,6 +356,10 @@ public class TreeComponent extends JComponent {
         Tree tree = treeDrawing.getTree();
 
         draw(treeDrawing, tree.getRoot(), g2d);
+
+        if (caption != null) {
+            drawCanonicalString(caption, 0.5, 1.1, TikzRenderingHints.VALUE_CENTER, TikzRenderingHints.VALUE_normalsize, g2d);
+        }
     }
 
     public static void main(String[] args) throws Exception {
@@ -398,14 +381,6 @@ public class TreeComponent extends JComponent {
         treeComponent.setSize(new Dimension(100, 100));
         treeComponent.paintComponent(tikzGraphics2D);
         tikzGraphics2D.flush();
-
-        //System.out.println(tikzGraphics2D.toString());
-        //tikzGraphics2D.paintComponent(treeComponent);
-
-//        JFrame frame = new JFrame("TreeComponent");
-//        frame.getContentPane().add(treeComponent, BorderLayout.CENTER);
-//        frame.setSize(new Dimension(800, 600));
-//        frame.setVisible(true);
     }
 
     public void setLeafTimeLabels(String[] leafTimeLabels) {
@@ -418,6 +393,10 @@ public class TreeComponent extends JComponent {
 
     public void setLeafTimeLabelFontSize(TreeDrawing.FontSize fontSize) {
         this.leafTimeLabelsFontSize = fontSize;
+    }
+
+    public void setCaption(String caption) {
+        this.caption = caption;
     }
 }
 
