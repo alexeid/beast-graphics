@@ -31,7 +31,8 @@
         <taxa idref='taxonset'/>
     </trait>
 
-    <treeDrawing spec='beast.app.draw.tree.TreeDrawing' id='treeDrawing' orientation="right" showLeafLabels="false"
+    <treeDrawing spec='beast.app.draw.tree.RootedTreeDrawing' id='treeDrawing' orientation="right"
+                 showLeafLabels="false"
                  lineThickness="1" rotateTree="ladderizeRight">
         <leafDecorator spec="beast.app.draw.tree.NodeDecorator" nodeShape="circle" nodeColor="red" nodeSize="4"/>
         <internalNodeDecorator spec="beast.app.draw.tree.NodeDecorator" nodeShape="circle" nodeColor="yellow"
@@ -49,7 +50,7 @@
         </tree>
     </treeDrawing>
 
-    <run spec='beast.app.draw.tree.TikzTreeGrid' fileName="figure_SerialSampleCoalescentTree.tex" width="320"
+    <run spec='beast.app.draw.tree.TreeDrawingGrid' fileName="figure_SerialSampleCoalescentTree.tex" width="320"
          height="180" debug="false" pdflatexPath="/usr/texbin/pdflatex">
         <treeDrawing idref="treeDrawing"/>
     </run>

@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class TreeComponent extends JComponent {
 
-    TreeDrawing treeDrawing;
+    RootedTreeDrawing treeDrawing;
     TreeDrawingOrientation orientation = TreeDrawingOrientation.UP;
     BranchStyle branchStyle = BranchStyle.SQUARE;
     NodeDecorator leafDecorator, internalNodeDecorator;
@@ -48,7 +48,7 @@ public class TreeComponent extends JComponent {
     /**
      * @param treeDrawing the  tree drawing
      */
-    public TreeComponent(TreeDrawing treeDrawing) {
+    public TreeComponent(RootedTreeDrawing treeDrawing) {
 
         format.setMaximumFractionDigits(5);
 
@@ -141,25 +141,10 @@ public class TreeComponent extends JComponent {
 
         Point2D p = getTransformedPoint2D(new Point2D.Double(x, y));
 
-        drawString(string, p.getX(), p.getY(), anchor, fontSize, g);
+        treeDrawing.drawString(string, p.getX(), p.getY(), anchor, fontSize, g);
     }
 
-    void drawString(String string, double x, double y, Object anchor, Object fontSize, Graphics2D g) {
-        if (string != null) {
-            Object oldAnchorValue = g.getRenderingHint(TikzRenderingHints.KEY_NODE_ANCHOR);
-            Object oldFontSize = g.getRenderingHint(TikzRenderingHints.KEY_FONT_SIZE);
-            g.setRenderingHint(TikzRenderingHints.KEY_NODE_ANCHOR, anchor);
-            g.setRenderingHint(TikzRenderingHints.KEY_FONT_SIZE, fontSize);
-
-            g.drawString(string, (float) x, (float) y);
-
-            if (oldAnchorValue != null) g.setRenderingHint(TikzRenderingHints.KEY_NODE_ANCHOR, oldAnchorValue);
-            if (oldFontSize != null) g.setRenderingHint(TikzRenderingHints.KEY_FONT_SIZE, oldFontSize);
-        }
-
-    }
-
-    private boolean isDrawingBranchLabels(TreeDrawing treeDrawing) {
+    private boolean isDrawingBranchLabels(RootedTreeDrawing treeDrawing) {
         return treeDrawing.getBranchLabels() != null && !treeDrawing.getBranchLabels().equals("");
     }
 
@@ -210,14 +195,14 @@ public class TreeComponent extends JComponent {
 
         Point2D p = getTransformedPoint2D(branchStyle.getCanonicalBranchLabelPoint2D(getCanonicalNodePoint2D(childNode), getCanonicalNodePoint2D(node)));
 
-        drawString(label, p.getX(), p.getY(), orientation.getBranchLabelAnchor(), fontSize, g);
+        treeDrawing.drawString(label, p.getX(), p.getY(), orientation.getBranchLabelAnchor(), fontSize, g);
     }
 
     final void drawLeafLabel(Node node, Graphics2D g) {
 
         Point2D nodePoint = getTransformedNodePoint2D(node);
 
-        drawString(node.getID(), nodePoint.getX(), nodePoint.getY(), orientation.getLeafLabelAnchor(), TikzRenderingHints.VALUE_normalsize, g);
+        treeDrawing.drawString(node.getID(), nodePoint.getX(), nodePoint.getY(), orientation.getLeafLabelAnchor(), TikzRenderingHints.VALUE_normalsize, g);
     }
 
     /**
@@ -227,7 +212,7 @@ public class TreeComponent extends JComponent {
      * @param node
      * @param g
      */
-    void draw(TreeDrawing treeDrawing, Node node, Graphics2D g) {
+    void draw(RootedTreeDrawing treeDrawing, Node node, Graphics2D g) {
 
         Tree tree = treeDrawing.getTree();
 
@@ -342,7 +327,7 @@ public class TreeComponent extends JComponent {
             }
             if (decorator.showNodeTimeLabels()) {
                 String nodeTimeLabel = decorator.getCurrentLabel(label);
-                drawString(nodeTimeLabel, p2.getX(), p2.getY(), orientation.getNodeHeightLabelAnchor(),
+                treeDrawing.drawString(nodeTimeLabel, p2.getX(), p2.getY(), orientation.getNodeHeightLabelAnchor(),
                         decorator.getNodeTimeLabelFontSize().getTikzRenderingHint(), g);
                 decorator.incrementCurrent();
             }
@@ -356,10 +341,6 @@ public class TreeComponent extends JComponent {
         Tree tree = treeDrawing.getTree();
 
         draw(treeDrawing, tree.getRoot(), g2d);
-
-        if (caption != null) {
-            drawCanonicalString(caption, 0.5, 1.1, TikzRenderingHints.VALUE_CENTER, TikzRenderingHints.VALUE_normalsize, g2d);
-        }
     }
 
     public static void main(String[] args) throws Exception {
@@ -375,7 +356,7 @@ public class TreeComponent extends JComponent {
 
         Alignment alignment = new Alignment(sequences, 4, "nucleotide");
 
-        TreeComponent treeComponent = new TreeComponent(new TreeDrawing(new TreeParser(alignment, newickTree)));
+        TreeComponent treeComponent = new TreeComponent(new RootedTreeDrawing(new TreeParser(alignment, newickTree)));
 
         TikzGraphics2D tikzGraphics2D = new TikzGraphics2D();
         treeComponent.setSize(new Dimension(100, 100));

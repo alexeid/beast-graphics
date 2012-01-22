@@ -16,7 +16,7 @@
     </tree>
 
     <plate var="n" range="up,right,down,left">
-        <treeDrawing spec='beast.app.draw.tree.TreeDrawing' id='treeDrawing-$(n)' showLeafLabels="true"
+        <treeDrawing spec='beast.app.draw.tree.RootedTreeDrawing' id='treeDrawing-$(n)' showLeafLabels="true"
                      lineThickness="1.25" branchLabels="&amp;rate"
                      orientation='$(n)'>
             <leafTimesDecorator spec='beast.app.draw.tree.NodeTimesDecorator' showLines="true" showLabels="true"/>
@@ -26,7 +26,7 @@
         </treeDrawing>
     </plate>
 
-    <run spec='beast.app.draw.tree.TikzTreeGrid' fileName="testTikzTreeOrientation.tex" width="120" height="120"
+    <run spec='beast.app.draw.tree.TreeDrawingGrid' fileName="testTikzTreeOrientation.tex" width="120" height="120"
          oneScale="false"
          strideLength="2" columnSpacer="60" rowSpacer="60" pdflatexPath="/usr/texbin/pdflatex">
         <plate var="n" range="up,right,down,left">

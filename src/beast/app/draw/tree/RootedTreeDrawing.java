@@ -2,11 +2,12 @@ package beast.app.draw.tree;
 
 import beast.core.Description;
 import beast.core.Input;
-import beast.core.Plugin;
 import beast.evolution.tree.Tree;
 import beast.evolution.tree.TreeUtils;
 import beast.evolution.tree.coalescent.TreeIntervals;
 
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
 
 /**
@@ -14,7 +15,7 @@ import java.util.Arrays;
  */
 
 @Description("Encapsulates a tree and options to draw it within the context of a TikzTreeFigure.")
-public class TreeDrawing extends Plugin {
+public class RootedTreeDrawing extends AbstractTreeDrawing {
 
     enum TreeOrientation {up, down, left, right}
 
@@ -22,14 +23,6 @@ public class TreeDrawing extends Plugin {
 
     enum NodePosition {average, triangulated}
 
-    enum RotateTree {ladderizeLeft, ladderizeRight}
-
-    public Input<Tree> treeInput = new Input<Tree>("tree", "a phylogenetic tree", Input.Validate.REQUIRED);
-    public Input<Double> lineThicknessInput = new Input<Double>("lineThickness", "indicates the thickness of the lines", 1.0);
-    public Input<Boolean> showLeafLabelsInput = new Input<Boolean>("showLeafLabels", "if true then the leaf labels are shown.", true);
-
-    public Input<Double> leafLabelOffsetInput = new Input<Double>("leafLabelOffset", "indicates the distance from leaf node to its label in pts", 5.0);
-    public Input<String> branchLabelsInput = new Input<String>("branchLabels", "the attribute name of values to display on the branches, or empty string if no branch labels to be displayed", "");
     public Input<TreeOrientation> treeOrientationInput = new Input<TreeOrientation>("orientation", "The orientation of the tree. Valid values are " +
             Arrays.toString(TreeOrientation.values()) + " (default 'right')", TreeOrientation.right, TreeOrientation.values());
     public Input<TreeBranchStyle> treeBranchStyleInput = new Input<TreeBranchStyle>("branchStyle", "The style to draw branches in. Valid values are " +
@@ -37,28 +30,17 @@ public class TreeDrawing extends Plugin {
     public Input<NodePosition> nodePositionInput = new Input<NodePosition>("nodePositioning", "option for node positioning. Valid values are " +
             Arrays.toString(NodePosition.values()) + " (default 'average')", NodePosition.average, NodePosition.values());
 
-    public Input<NodeDecorator> leafDecorator = new Input<NodeDecorator>("leafDecorator", "options for how to draw the leaf nodes");
-    public Input<NodeDecorator> internalNodeDecorator = new Input<NodeDecorator>("internalNodeDecorator", "options for how to draw the internal nodes");
-
     public Input<NodeTimesDecorator> leafTimesDecorator = new Input<NodeTimesDecorator>("leafTimesDecorator", "options for how to display leaf times");
     public Input<NodeTimesDecorator> internalNodeTimesDecorator = new Input<NodeTimesDecorator>("internalNodeTimesDecorator", "options for how to display internal node times");
-
-    public Input<RotateTree> rotateTreeInput = new Input<RotateTree>("rotateTree", "if true then tree nodes are rotated by given criteria. Valid values are "
-            + Arrays.toString(RotateTree.values()), RotateTree.ladderizeLeft, RotateTree.values());
-    public Input<String> captionInput = new Input<String>("caption", "caption for tree figure", "");
 
     private TreeIntervals treeIntervals;
     TreeComponent treeComponent;
 
-    public TreeDrawing() {
+    public RootedTreeDrawing() {
     }
 
-    public TreeDrawing(Tree tree) throws Exception {
+    public RootedTreeDrawing(Tree tree) throws Exception {
         init(tree);
-    }
-
-    public TreeComponent getComponent() {
-        return treeComponent;
     }
 
     public void initAndValidate() throws Exception {
@@ -109,12 +91,10 @@ public class TreeDrawing extends Plugin {
             treeComponent.internalNodeTimesDecorator = internalNodeTimesDecorator.get();
         }
 
-        if (rotateTreeInput.get() != null) {
-            if (rotateTreeInput.get() == RotateTree.ladderizeLeft) {
-                TreeUtils.rotateNodeByComparator(treeComponent.tree.getRoot(), TreeUtils.createReverseNodeDensityMinNodeHeightComparator());
-            } else if (rotateTreeInput.get() == RotateTree.ladderizeRight) {
-                TreeUtils.rotateNodeByComparator(treeComponent.tree.getRoot(), TreeUtils.createNodeDensityMinNodeHeightComparator());
-            }
+        if (rotateTreeInput.get() == RotateTree.ladderizeLeft) {
+            TreeUtils.rotateNodeByComparator(treeComponent.tree.getRoot(), TreeUtils.createReverseNodeDensityMinNodeHeightComparator());
+        } else if (rotateTreeInput.get() == RotateTree.ladderizeRight) {
+            TreeUtils.rotateNodeByComparator(treeComponent.tree.getRoot(), TreeUtils.createNodeDensityMinNodeHeightComparator());
         }
 
         String caption = captionInput.get();
@@ -123,8 +103,19 @@ public class TreeDrawing extends Plugin {
         }
     }
 
-    public Tree getTree() {
-        return treeInput.get();
+    @Override
+    public void setBounds(Rectangle2D bounds) {
+        treeComponent.setBounds(bounds);
+    }
+
+    @Override
+    public void paintTree(Graphics2D g) {
+        treeComponent.paint(g);
+    }
+
+    @Override
+    public void setRootHeightForCanonicalScaling(double height) {
+        treeComponent.rootHeightForScale = height;
     }
 
     public TreeIntervals getTreeIntervals() {
@@ -137,10 +128,5 @@ public class TreeDrawing extends Plugin {
 
     public boolean showLeafLabels() {
         return showLeafLabelsInput.get();
-    }
-
-
-    public double getLineThickness() {
-        return lineThicknessInput.get();
     }
 }

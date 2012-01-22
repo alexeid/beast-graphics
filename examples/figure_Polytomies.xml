@@ -33,22 +33,22 @@
         </input>
     </tree>
 
-    <run spec='beast.app.draw.tree.TikzTreeGrid' fileName="figure_Polytomies.tex" width="75" height="75"
+    <run spec='beast.app.draw.tree.TreeDrawingGrid' fileName="figure_Polytomies.tex" width="75" height="75"
          oneScale="true"
-         strideLength="3"
-         isHorizontalStride="true" columnSpacer="58" pdflatexPath="/usr/texbin/pdflatex">
+         strideLength="3" captionPosition="north"
+         isHorizontalStride="true" columnSpacer="58" rowSpacer="30" pdflatexPath="/usr/texbin/pdflatex">
 
-        <treeDrawing spec='beast.app.draw.tree.TreeDrawing' showLeafLabels="true"
+        <treeDrawing spec='beast.app.draw.tree.RootedTreeDrawing' showLeafLabels="true"
                      lineThickness="1.25" leafLabelOffset="10"
                      orientation="down" nodePositioning="triangulated" branchStyle="line" caption="(a) a star tree">
             <tree idref="atree"/>
         </treeDrawing>
-        <treeDrawing spec='beast.app.draw.tree.TreeDrawing' showLeafLabels="true"
+        <treeDrawing spec='beast.app.draw.tree.RootedTreeDrawing' showLeafLabels="true"
                      lineThickness="1.25" leafLabelOffset="10" orientation="down"
                      nodePositioning="triangulated" branchStyle="line" caption="(b) partially-resolved tree">
             <tree idref="btree"/>
         </treeDrawing>
-        <treeDrawing spec='beast.app.draw.tree.TreeDrawing' showLeafLabels="true"
+        <treeDrawing spec='beast.app.draw.tree.RootedTreeDrawing' showLeafLabels="true"
                      lineThickness="1.25" leafLabelOffset="10" orientation="down"
                      nodePositioning="triangulated" branchStyle="line" caption="(c) fully-resolved tree">
             <tree idref="ctree"/>

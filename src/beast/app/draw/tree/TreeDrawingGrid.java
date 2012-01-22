@@ -4,6 +4,7 @@ import beast.core.Description;
 import beast.core.Input;
 import beast.evolution.tree.Tree;
 import org.jtikz.TikzGraphics2D;
+import org.jtikz.TikzRenderingHints;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -11,15 +12,19 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * @author Alexei Drummond
  */
 @Description("Generates the tree figure in grid format, from input trees into Tikz/PGF format for addition to LaTeX document.")
-public class TikzTreeGrid extends beast.core.Runnable {
+public class TreeDrawingGrid extends beast.core.Runnable {
 
-    public Input<List<TreeDrawing>> treeDrawing = new Input<List<TreeDrawing>>("treeDrawing", "a tree drawing", new ArrayList<TreeDrawing>());
+    enum CaptionLocation {east, west, north, south}
+
+
+    public Input<List<AbstractTreeDrawing>> treeDrawing = new Input<List<AbstractTreeDrawing>>("treeDrawing", "a tree drawing", new ArrayList<AbstractTreeDrawing>());
     public Input<Integer> strideLength = new Input<Integer>("strideLength", "The number of trees to display in a 'stride' before wrapping to the next stride", 2);
     public Input<Boolean> isHorizontalStride = new Input<Boolean>("isHorizontalStride", "if true then strides are displayed horizontally, else vertically", true);
     public Input<Integer> width = new Input<Integer>("width", "the width of a grid cell in the figure", 150);
@@ -30,6 +35,8 @@ public class TikzTreeGrid extends beast.core.Runnable {
     public Input<String> fileName = new Input<String>("fileName", "the name of the file to write Tikz code to", "");
     public Input<Boolean> debug = new Input<Boolean>("debug", "if true then gray guidelines are drawn to assist debugging", false);
     public Input<String> pdflatexPath = new Input<String>("pdflatexPath", "the path to pdflatex; if provided then will be run automatically", "");
+    public Input<CaptionLocation> captionLocationInput = new Input<CaptionLocation>("captionPosition", "the position of caption relative to tree bounds. Valid values are "
+            + Arrays.toString(CaptionLocation.values()) + " (default 'south')", CaptionLocation.south, CaptionLocation.values());
 
     /**
      * The maximum root height of trees
@@ -39,7 +46,7 @@ public class TikzTreeGrid extends beast.core.Runnable {
     public void initAndValidate() {
 
         maxRootHeight = 0;
-        for (TreeDrawing drawing : treeDrawing.get()) {
+        for (AbstractTreeDrawing drawing : treeDrawing.get()) {
 
             Tree tree = drawing.getTree();
             if (tree.getRoot().getHeight() > maxRootHeight) {
@@ -66,14 +73,14 @@ public class TikzTreeGrid extends beast.core.Runnable {
 
         Rectangle2D bounds;
 
-        for (TreeDrawing drawing : treeDrawing.get()) {
+        for (AbstractTreeDrawing drawing : treeDrawing.get()) {
 
-            TreeComponent component = drawing.getComponent();
+            //TreeComponent component = drawing.getComponent();
             bounds = new Rectangle2D.Double(x, y, w, h);
 
-            component.setBounds(bounds);
+            drawing.setBounds(bounds);
             if (oneScale.get()) {
-                component.rootHeightForScale = maxRootHeight;
+                drawing.setRootHeightForCanonicalScaling(maxRootHeight);
             }
 
             if (debug.get()) {
@@ -83,7 +90,40 @@ public class TikzTreeGrid extends beast.core.Runnable {
                 g.drawString(count + "", (float) bounds.getX(), (float) bounds.getY());
             }
 
-            component.paint(g);
+            drawing.paintTree(g);
+            String caption = drawing.getCaption();
+
+            if (caption != null) {
+                Object oldAnchorValue = g.getRenderingHint(TikzRenderingHints.KEY_NODE_ANCHOR);
+                Object oldFontSize = g.getRenderingHint(TikzRenderingHints.KEY_FONT_SIZE);
+                g.setRenderingHint(TikzRenderingHints.KEY_FONT_SIZE, TikzRenderingHints.VALUE_normalsize);
+
+                g.setColor(Color.black);
+
+                switch (captionLocationInput.get()) {
+                    case east:
+                        g.setRenderingHint(TikzRenderingHints.KEY_NODE_ANCHOR, TikzRenderingHints.VALUE_WEST);
+                        g.drawString(caption, (float) bounds.getMaxX(), (float) bounds.getCenterY());
+                        break;
+                    case west:
+                        g.setRenderingHint(TikzRenderingHints.KEY_NODE_ANCHOR, TikzRenderingHints.VALUE_EAST);
+                        g.drawString(caption, (float) bounds.getMinX(), (float) bounds.getCenterY());
+                        break;
+                    case north:
+                        g.setRenderingHint(TikzRenderingHints.KEY_NODE_ANCHOR, TikzRenderingHints.VALUE_CENTER);
+                        g.drawString(caption, (float) bounds.getCenterX(), (float) (bounds.getMinY() - rowSpacer.get() * 0.45));
+                        break;
+                    case south:
+                    default:
+                        g.setRenderingHint(TikzRenderingHints.KEY_NODE_ANCHOR, TikzRenderingHints.VALUE_CENTER);
+                        g.drawString(caption, (float) bounds.getCenterX(), (float) (bounds.getMaxY() + rowSpacer.get() * 0.45));
+                }
+
+                if (oldAnchorValue != null) g.setRenderingHint(TikzRenderingHints.KEY_NODE_ANCHOR, oldAnchorValue);
+                if (oldFontSize != null) g.setRenderingHint(TikzRenderingHints.KEY_FONT_SIZE, oldFontSize);
+            }
+
+
             count += 1;
             if (count % strideLength.get() == 0) {
                 // next stride
