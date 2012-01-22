@@ -23,7 +23,7 @@
 
     <plate var="n" range="1,2,3,4,5,6,7,8,9">
         <treeDrawing spec='beast.app.draw.tree.TreeDrawing' id='treeDrawing$(n)' showLeafLabels="true"
-                     lineThickness="1.25" showLeafTimes="true">
+                     lineThickness="1.25">
             <tree spec='beast.evolution.tree.RandomTree'>
 
                 <taxonset idref='taxonset'/>
@@ -33,10 +33,15 @@
                     <popSize spec='parameter.RealParameter' value='1'/>
                 </populationModel>
             </tree>
+            <leafTimesDecorator spec='beast.app.draw.tree.NodeTimesDecorator' showLines="true" showLabels="false"/>
+            <internalNodeTimesDecorator spec='beast.app.draw.tree.NodeTimesDecorator' showLines="false"
+                                        showLabels="false"/>
+
         </treeDrawing>
     </plate>
 
-    <run spec='beast.app.draw.tree.TikzTreeGrid' fileName="testTikzTree.tex" width="120" height="120" oneScale="true"
+    <run spec='beast.app.draw.tree.TikzTreeGrid' fileName="testTikzTree.tex" width="100" height="100" oneScale="true"
+         rowSpacer="40" columnSpacer="30"
          strideLength="3" pdflatexPath="/usr/texbin/pdflatex">
         <plate var="n" range="1,2,3,4,5,6,7,8,9">
             <treeDrawing idref="treeDrawing$(n)"/>

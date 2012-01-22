@@ -1,0 +1,179 @@
+<beast version='2.0'
+       namespace='beast.core:beast.evolution.alignment:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood'>
+
+    <!-- figure 2.2 for BEAST book -->
+
+    <taxonset spec='TaxonSet' id='taxonset'>
+        <taxon spec='Taxon' id='A'/>
+        <taxon spec='Taxon' id='B'/>
+        <taxon spec='Taxon' id='C'/>
+        <taxon spec='Taxon' id='D'/>
+    </taxonset>
+
+
+    <!-- ROW 1 -->
+
+    <tree spec='beast.util.TreeParser' id='tree-1'>
+        <taxonset idref='taxonset'/>
+        <input name='newick'>
+            ((A:1,B:1):2,(C:2,D:2):1);
+        </input>
+    </tree>
+
+
+    <tree spec='beast.util.TreeParser' id='tree-2'>
+        <taxonset idref='taxonset'/>
+        <input name='newick'>
+            (((A:1,B:1):1,C:2):1,D:3);
+        </input>
+    </tree>
+
+    <tree spec='beast.util.TreeParser' id='tree-3'>
+        <taxonset idref='taxonset'/>
+        <input name='newick'>
+            (((A:1,B:1):1,D:2):1,C:3);
+        </input>
+    </tree>
+
+    <!-- ROW 2 -->
+
+    <tree spec='beast.util.TreeParser' id='tree-4'>
+        <taxonset idref='taxonset'/>
+        <input name='newick'>
+            ((A:2,B:2):1,(C:1,D:1):2);
+        </input>
+    </tree>
+
+    <tree spec='beast.util.TreeParser' id='tree-5'>
+        <taxonset idref='taxonset'/>
+        <input name='newick'>
+            (((C:1,D:1):1,A:2):1,B:3);
+        </input>
+    </tree>
+
+    <tree spec='beast.util.TreeParser' id='tree-6'>
+        <taxonset idref='taxonset'/>
+        <input name='newick'>
+            (((C:1,D:1):1,B:2):1,A:3);
+        </input>
+    </tree>
+
+    <!-- ROW 3 -->
+
+    <tree spec='beast.util.TreeParser' id='tree-7'>
+        <taxonset idref='taxonset'/>
+        <input name='newick'>
+            ((A:1,C:1):2,(B:2,D:2):1);
+        </input>
+    </tree>
+
+
+    <tree spec='beast.util.TreeParser' id='tree-8'>
+        <taxonset idref='taxonset'/>
+        <input name='newick'>
+            (((A:1,C:1):1,B:2):1,D:3);
+        </input>
+    </tree>
+
+    <tree spec='beast.util.TreeParser' id='tree-9'>
+        <taxonset idref='taxonset'/>
+        <input name='newick'>
+            (((A:1,C:1):1,D:2):1,B:3);
+        </input>
+    </tree>
+
+    <!-- ROW 4 -->
+
+    <tree spec='beast.util.TreeParser' id='tree-10'>
+        <taxonset idref='taxonset'/>
+        <input name='newick'>
+            ((A:2,C:2):1,(B:1,D:1):2);
+        </input>
+    </tree>
+
+    <tree spec='beast.util.TreeParser' id='tree-11'>
+        <taxonset idref='taxonset'/>
+        <input name='newick'>
+            (((B:1,D:1):1,A:2):1,C:3);
+        </input>
+    </tree>
+
+    <tree spec='beast.util.TreeParser' id='tree-12'>
+        <taxonset idref='taxonset'/>
+        <input name='newick'>
+            (((B:1,D:1):1,C:2):1,A:3);
+        </input>
+    </tree>
+
+    <!-- ROW 5 -->
+
+    <tree spec='beast.util.TreeParser' id='tree-13'>
+        <taxonset idref='taxonset'/>
+        <input name='newick'>
+            ((A:1,D:1):2,(B:2,C:2):1);
+        </input>
+    </tree>
+
+
+    <tree spec='beast.util.TreeParser' id='tree-14'>
+        <taxonset idref='taxonset'/>
+        <input name='newick'>
+            (((A:1,D:1):1,B:2):1,C:3);
+        </input>
+    </tree>
+
+    <tree spec='beast.util.TreeParser' id='tree-15'>
+        <taxonset idref='taxonset'/>
+        <input name='newick'>
+            (((A:1,D:1):1,C:2):1,B:3);
+        </input>
+    </tree>
+
+    <!-- ROW 6 -->
+
+    <tree spec='beast.util.TreeParser' id='tree-16'>
+        <taxonset idref='taxonset'/>
+        <input name='newick'>
+            ((A:2,D:2):1,(B:1,C:1):2);
+        </input>
+    </tree>
+
+    <tree spec='beast.util.TreeParser' id='tree-17'>
+        <taxonset idref='taxonset'/>
+        <input name='newick'>
+            (((B:1,C:1):1,A:2):1,D:3);
+        </input>
+    </tree>
+
+    <tree spec='beast.util.TreeParser' id='tree-18'>
+        <taxonset idref='taxonset'/>
+        <input name='newick'>
+            (((B:1,C:1):1,D:2):1,A:3);
+        </input>
+    </tree>
+
+    <run spec='beast.app.draw.tree.TikzTreeGrid' fileName="figure_Ranked4Trees.tex" width="60" height="60"
+         strideLength="3"
+         isHorizontalStride="true" columnSpacer="58" rowSpacer="32" pdflatexPath="/usr/texbin/pdflatex">
+
+        <treeDrawing spec='beast.app.draw.tree.TreeDrawing' showLeafLabels="true"
+                     lineThickness="1.25" leafLabelOffset="10" orientation="down" nodePositioning="triangulated"
+                     branchStyle="line" rotateTree="ladderizeLeft">
+            <tree idref="tree-1"/>
+            <leafTimesDecorator spec='beast.app.draw.tree.NodeTimesDecorator' showLabels="true" labels="$t_4$"/>
+            <internalNodeTimesDecorator spec='beast.app.draw.tree.NodeTimesDecorator' showLabels="true"
+                                        labels="$t_3$,$t_2$,$t_1$"/>
+        </treeDrawing>
+        <plate var="n" range="2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18">
+            <treeDrawing spec='beast.app.draw.tree.TreeDrawing' showLeafLabels="true"
+                         lineThickness="1.25" leafLabelOffset="10" orientation="down" nodePositioning="triangulated"
+                         branchStyle="line" rotateTree="ladderizeLeft">
+                <tree idref="tree-$(n)"/>
+                <leafTimesDecorator spec='beast.app.draw.tree.NodeTimesDecorator' showLabels="false"/>
+                <internalNodeTimesDecorator spec='beast.app.draw.tree.NodeTimesDecorator' showLabels="false"/>
+            </treeDrawing>
+        </plate>
+
+    </run>
+</beast>
+

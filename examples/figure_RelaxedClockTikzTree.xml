@@ -35,14 +35,15 @@
          strideLength="2"
          isHorizontalStride="true" columnSpacer="60" pdflatexPath="/usr/texbin/pdflatex">
 
-        <treeDrawing spec='beast.app.draw.tree.TreeDrawing' showLeafLabels="true"
-                     lineThickness="1.25" labelOffset="10" showLeafTimes="true" showInternalNodeTimes="true"
-                     branchLabels="&amp;rate"
-                     orientation="down">
+        <treeDrawing spec='beast.app.draw.tree.TreeDrawing' showLeafLabels="true" lineThickness="1.25"
+                     leafLabelOffset="10" branchLabels="&amp;rate" orientation="down">
             <tree idref="tree"/>
+            <leafTimesDecorator spec='beast.app.draw.tree.NodeTimesDecorator' showLines="true" showLabels="true"/>
+            <internalNodeTimesDecorator spec='beast.app.draw.tree.NodeTimesDecorator' showLines="true"
+                                        showLabels="true"/>
         </treeDrawing>
         <treeDrawing spec='beast.app.draw.tree.TreeDrawing' showLeafLabels="true"
-                     lineThickness="1.25" labelOffset="10" showLeafTimes="false" orientation="down">
+                     lineThickness="1.25" leafLabelOffset="10" orientation="down">
             <tree idref="tree2"/>
         </treeDrawing>
         <!-- <treeDrawing spec='beast.app.draw.tree.UnrootedTreeDrawing' showLeafLabels="true"

@@ -27,6 +27,10 @@ public class TreeComponent extends JComponent {
     BranchStyle branchStyle = BranchStyle.SQUARE;
     NodeDecorator leafDecorator, internalNodeDecorator;
     NodePositioningRule positioningRule = NodePositioningRule.AVERAGE_OF_CHILDREN;
+
+    NodeTimesDecorator leafTimesDecorator;
+    NodeTimesDecorator internalNodeTimesDecorator;
+
     String caption = null;
 
     Tree tree;
@@ -40,8 +44,6 @@ public class TreeComponent extends JComponent {
     private boolean drawAxis = true;
 
     private Rectangle2D bounds = new Rectangle2D.Double(0, 0, 1, 1);
-    private String[] leafTimeLabels;
-    private TreeDrawing.FontSize leafTimeLabelsFontSize = TreeDrawing.FontSize.normalsize;
 
     /**
      * @param treeDrawing the  tree drawing
@@ -90,10 +92,16 @@ public class TreeComponent extends JComponent {
 
     void positionInternalNodes(Node node) {
         if (!node.isLeaf()) {
-            positioningRule.setPosition(node, "p");
+            if (positioningRule.getTraversalOrder() == NodePositioningRule.TraversalOrder.PRE_ORDER) {
+                positioningRule.setPosition(node, "p");
+            }
             for (Node child : node.getChildren()) {
                 positionInternalNodes(child);
             }
+            if (positioningRule.getTraversalOrder() == NodePositioningRule.TraversalOrder.POST_ORDER) {
+                positioningRule.setPosition(node, "p");
+            }
+
         }
     }
 
@@ -156,15 +164,15 @@ public class TreeComponent extends JComponent {
     }
 
     private Point2D getCanonicalNodePoint2D(Node node) {
-        return new Point2D.Double(getCanonicalNodeX(node), getCanonicalNodeY(node.getTree(), node.getHeight()));
+        return new Point2D.Double(getCanonicalNodeX(node), getCanonicalNodeY(node.getHeight()));
     }
 
     private double getCanonicalNodeX(Node node) {
         return (Double) node.getMetaData("p");
     }
 
-    private double getCanonicalNodeY(Tree tree, double height) {
-        return height / tree.getRoot().getHeight();
+    private double getCanonicalNodeY(double height) {
+        return height / rootHeightForScale;
     }
 
     private double getCanonicalNodeSpacing(Tree tree) {
@@ -223,8 +231,8 @@ public class TreeComponent extends JComponent {
 
         Tree tree = treeDrawing.getTree();
 
-        if ((treeDrawing.showInternalNodeTimes() || treeDrawing.showLeafTimes()) && node.isRoot()) {
-            drawNodeTimes(treeDrawing.getTreeIntervals(), treeDrawing.showInternalNodeTimes(), treeDrawing.showLeafTimes(), g);
+        if ((internalNodeTimesDecorator != null || leafTimesDecorator != null) && node.isRoot()) {
+            drawNodeTimes(treeDrawing.getTreeIntervals(), g);
         }
 
         g.setStroke(new BasicStroke((float) treeDrawing.getLineThickness()));
@@ -237,7 +245,7 @@ public class TreeComponent extends JComponent {
         }
 
         if (node.isLeaf()) {
-            if (treeDrawing.showLeafNodes()) {
+            if (treeDrawing.showLeafLabels()) {
                 drawLeafLabel(node, g);
             }
         } else {
@@ -279,7 +287,7 @@ public class TreeComponent extends JComponent {
         }
     }
 
-    private void drawNodeTimes(TreeIntervals treeIntervals, boolean showInternalNodeTimes, boolean showLeafTimes, Graphics2D g) {
+    private void drawNodeTimes(TreeIntervals treeIntervals, Graphics2D g) {
 
         Tree tree = treeIntervals.m_tree.get();
         Stroke s = g.getStroke();
@@ -293,30 +301,27 @@ public class TreeComponent extends JComponent {
         String label = format.format(unscaledHeight);
         IntervalType oldIntervalType = IntervalType.SAMPLE;
         IntervalType newIntervalType;
-        int leafLabelIndex = 0;
-        if (leafTimeLabels != null) {
-            label = leafTimeLabels[leafLabelIndex];
-            leafLabelIndex += 1;
-        }
+        if (internalNodeTimesDecorator != null) internalNodeTimesDecorator.resetCurrent();
+        if (leafTimesDecorator != null) leafTimesDecorator.resetCurrent();
+        NodeTimesDecorator decorator = leafTimesDecorator;
 
-        drawNodeTime(label, getCanonicalNodeY(tree, unscaledHeight), p1, p2, g);
+        drawNodeTime(label, decorator, getCanonicalNodeY(unscaledHeight), p1, p2, g);
         for (int i = 0; i < treeIntervals.getIntervalCount(); i++) {
 
             double interval = treeIntervals.getInterval(i);
             newIntervalType = treeIntervals.getIntervalType(i);
 
             unscaledHeight += interval;
-            if ((newIntervalType == IntervalType.SAMPLE && showLeafTimes) || (newIntervalType == IntervalType.COALESCENT && showInternalNodeTimes)) {
 
-                if (interval > 0.0 || (newIntervalType != oldIntervalType)) {
-                    label = format.format(unscaledHeight);
-                    if (newIntervalType == IntervalType.SAMPLE && leafTimeLabels != null) {
-                        label = leafTimeLabels[leafLabelIndex];
-                        leafLabelIndex += 1;
-                    }
-                    drawNodeTime(label, getCanonicalNodeY(tree, unscaledHeight), p1, p2, g);
+            if (newIntervalType == IntervalType.SAMPLE) {
+                decorator = leafTimesDecorator;
+            } else if (newIntervalType == IntervalType.COALESCENT) {
+                decorator = internalNodeTimesDecorator;
+            }
 
-                }
+            if (interval > 0.0 || (newIntervalType != oldIntervalType)) {
+                label = format.format(unscaledHeight);
+                drawNodeTime(label, decorator, getCanonicalNodeY(unscaledHeight), p1, p2, g);
             }
             oldIntervalType = newIntervalType;
         }
@@ -327,27 +332,22 @@ public class TreeComponent extends JComponent {
         }
     }
 
-    void drawNodeTime(String label, double canonicalHeight, double pos1, double pos2, Graphics2D g) {
-        Point2D p1 = getTransformedPoint2D(new Point2D.Double(pos1, canonicalHeight));
-        Point2D p2 = getTransformedPoint2D(new Point2D.Double(pos2, canonicalHeight));
+    void drawNodeTime(String label, NodeTimesDecorator decorator, double canonicalHeight, double pos1, double pos2, Graphics2D g) {
+        if (decorator != null) {
+            Point2D p1 = getTransformedPoint2D(new Point2D.Double(pos1, canonicalHeight));
+            Point2D p2 = getTransformedPoint2D(new Point2D.Double(pos2, canonicalHeight));
 
-        g.draw(new Line2D.Double(p1, p2));
-        drawString(label, p2.getX(), p2.getY(), orientation.getNodeHeightLabelAnchor(),
-                getTikzRenderingHintFontSize(leafTimeLabelsFontSize), g);
-    }
-
-    private Object getTikzRenderingHintFontSize(TreeDrawing.FontSize fontSize) {
-        switch (fontSize) {
-            case scriptsize:
-                return TikzRenderingHints.VALUE_scriptsize;
-            case footnotesize:
-                return TikzRenderingHints.VALUE_footnotesize;
-            case normalsize:
-            default:
-                return TikzRenderingHints.VALUE_normalsize;
+            if (decorator.showNodeTimeLines()) {
+                g.draw(new Line2D.Double(p1, p2));
+            }
+            if (decorator.showNodeTimeLabels()) {
+                String nodeTimelabel = decorator.getCurrentLabel(label);
+                drawString(nodeTimelabel, p2.getX(), p2.getY(), orientation.getNodeHeightLabelAnchor(),
+                        decorator.getNodeTimeLabelFontSize().getTikzRenderingHint(), g);
+                decorator.incrementCurrent();
+            }
         }
     }
-
 
     public void paintComponent(Graphics g) {
 
@@ -381,18 +381,6 @@ public class TreeComponent extends JComponent {
         treeComponent.setSize(new Dimension(100, 100));
         treeComponent.paintComponent(tikzGraphics2D);
         tikzGraphics2D.flush();
-    }
-
-    public void setLeafTimeLabels(String[] leafTimeLabels) {
-        System.out.println("leaf time labels set to:");
-        for (String label : leafTimeLabels) {
-            System.out.println("  " + label);
-        }
-        this.leafTimeLabels = leafTimeLabels;
-    }
-
-    public void setLeafTimeLabelFontSize(TreeDrawing.FontSize fontSize) {
-        this.leafTimeLabelsFontSize = fontSize;
     }
 
     public void setCaption(String caption) {

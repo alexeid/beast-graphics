@@ -72,7 +72,9 @@ public class TikzTreeGrid extends beast.core.Runnable {
             bounds = new Rectangle2D.Double(x, y, w, h);
 
             component.setBounds(bounds);
-            if (oneScale.get()) component.rootHeightForScale = maxRootHeight;
+            if (oneScale.get()) {
+                component.rootHeightForScale = maxRootHeight;
+            }
 
             if (debug.get()) {
                 g.setStroke(new BasicStroke(0.5f));

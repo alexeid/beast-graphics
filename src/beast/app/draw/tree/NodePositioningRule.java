@@ -7,9 +7,20 @@ import beast.evolution.tree.Node;
  */
 public interface NodePositioningRule {
 
+    enum TraversalOrder {PRE_ORDER, POST_ORDER}
+
+    ;
+
+    public TraversalOrder getTraversalOrder();
+
     void setPosition(Node node, String positionLabel);
 
     public NodePositioningRule AVERAGE_OF_CHILDREN = new NodePositioningRule() {
+        @Override
+        public TraversalOrder getTraversalOrder() {
+            return TraversalOrder.POST_ORDER;
+        }
+
         @Override
         public void setPosition(Node node, String positionLabel) {
 
@@ -26,6 +37,11 @@ public interface NodePositioningRule {
     };
 
     public NodePositioningRule TRIANGULATED = new NodePositioningRule() {
+        @Override
+        public TraversalOrder getTraversalOrder() {
+            return TraversalOrder.PRE_ORDER;
+        }
+
         @Override
         public void setPosition(Node node, String positionLabel) {
 

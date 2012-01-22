@@ -17,8 +17,11 @@
 
     <plate var="n" range="up,right,down,left">
         <treeDrawing spec='beast.app.draw.tree.TreeDrawing' id='treeDrawing-$(n)' showLeafLabels="true"
-                     lineThickness="1.25" showLeafTimes="true" showInternalNodeTimes="true" branchLabels="&amp;rate"
+                     lineThickness="1.25" branchLabels="&amp;rate"
                      orientation='$(n)'>
+            <leafTimesDecorator spec='beast.app.draw.tree.NodeTimesDecorator' showLines="true" showLabels="true"/>
+            <internalNodeTimesDecorator spec='beast.app.draw.tree.NodeTimesDecorator' showLines="true"
+                                        showLabels="true"/>
             <tree idref='tree'/>
         </treeDrawing>
     </plate>

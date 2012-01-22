@@ -32,13 +32,11 @@
     </trait>
 
     <treeDrawing spec='beast.app.draw.tree.TreeDrawing' id='treeDrawing' orientation="right" showLeafLabels="false"
-                 showLeafTimes="true"
-                 lineThickness="1" showInternalNodeTimes="false" leafTimeLabels="$t_0$,$t_1$,$t_2$"
-                 leafTimeLabelsFontSize="normalsize" rotateTree="true">
+                 lineThickness="1" rotateTree="ladderizeRight">
         <leafDecorator spec="beast.app.draw.tree.NodeDecorator" nodeShape="circle" nodeColor="255,255,0" nodeSize="4"/>
         <internalNodeDecorator spec="beast.app.draw.tree.NodeDecorator" nodeShape="circle" nodeColor="255,0,0"
                                nodeSize="4"/>
-
+        <leafTimesDecorator spec='beast.app.draw.tree.NodeTimesDecorator' labels="$t_0$,$t_1$,$t_2$"/>
 
         <tree spec='beast.evolution.tree.RandomTree'>
 

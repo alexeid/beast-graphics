@@ -20,31 +20,31 @@ public class TreeDrawing extends Plugin {
 
     enum TreeBranchStyle {line, square}
 
-    enum FontSize {normalsize, footnotesize, scriptsize}
-
     enum NodePosition {average, triangulated}
+
+    enum RotateTree {ladderizeLeft, ladderizeRight}
 
     public Input<Tree> treeInput = new Input<Tree>("tree", "a phylogenetic tree", Input.Validate.REQUIRED);
     public Input<Double> lineThicknessInput = new Input<Double>("lineThickness", "indicates the thickness of the lines", 1.0);
-    public Input<Double> labelOffsetInput = new Input<Double>("labelOffset", "indicates the distance from leaf node to its label in pts", 5.0);
-    public Input<Boolean> showLeafLabelsInput = new Input<Boolean>("showLeafLabels", "if true then the taxa labels are displayed", true);
+    public Input<Boolean> showLeafLabelsInput = new Input<Boolean>("showLeafLabels", "if true then the leaf labels are shown.", true);
+
+    public Input<Double> leafLabelOffsetInput = new Input<Double>("leafLabelOffset", "indicates the distance from leaf node to its label in pts", 5.0);
     public Input<String> branchLabelsInput = new Input<String>("branchLabels", "the attribute name of values to display on the branches, or empty string if no branch labels to be displayed", "");
-    public Input<Boolean> showInternalNodeTimes = new Input<Boolean>("showInternalNodeTimes", "if true then dotted lines are displayed at each internal node height.", false);
-    public Input<Boolean> showLeafTimes = new Input<Boolean>("showLeafTimes", "if true then dotted lines are displayed at each unique leaf height.", true);
     public Input<TreeOrientation> treeOrientationInput = new Input<TreeOrientation>("orientation", "The orientation of the tree. Valid values are " +
             Arrays.toString(TreeOrientation.values()) + " (default 'right')", TreeOrientation.right, TreeOrientation.values());
     public Input<TreeBranchStyle> treeBranchStyleInput = new Input<TreeBranchStyle>("branchStyle", "The style to draw branches in. Valid values are " +
             Arrays.toString(TreeBranchStyle.values()) + " (default 'square')", TreeBranchStyle.square, TreeBranchStyle.values());
-    public Input<NodeDecorator> leafDecorator = new Input<NodeDecorator>("leafDecorator", "options for how to draw the leaf nodes");
     public Input<NodePosition> nodePositionInput = new Input<NodePosition>("nodePositioning", "option for node positioning. Valid values are " +
             Arrays.toString(NodePosition.values()) + " (default 'average')", NodePosition.average, NodePosition.values());
 
+    public Input<NodeDecorator> leafDecorator = new Input<NodeDecorator>("leafDecorator", "options for how to draw the leaf nodes");
     public Input<NodeDecorator> internalNodeDecorator = new Input<NodeDecorator>("internalNodeDecorator", "options for how to draw the internal nodes");
-    public Input<String> leafTimeLabelsInput = new Input<String>("leafTimeLabels", "labels for leaf times, comma-delimited");
-    public Input<FontSize> leafTimeLabelsFontSizeInput =
-            new Input<FontSize>("leafTimeLabelsFontSize", "font size of leaf time labels. Valid values are " +
-                    Arrays.toString(FontSize.values()), FontSize.normalsize, FontSize.values());
-    public Input<Boolean> rotateTreeInput = new Input<Boolean>("rotateTree", "if true then tree nodes are rotated by node density", false);
+
+    public Input<NodeTimesDecorator> leafTimesDecorator = new Input<NodeTimesDecorator>("leafTimesDecorator", "options for how to display leaf times");
+    public Input<NodeTimesDecorator> internalNodeTimesDecorator = new Input<NodeTimesDecorator>("internalNodeTimesDecorator", "options for how to display internal node times");
+
+    public Input<RotateTree> rotateTreeInput = new Input<RotateTree>("rotateTree", "if true then tree nodes are rotated by given criteria. Valid values are "
+            + Arrays.toString(RotateTree.values()), RotateTree.ladderizeLeft, RotateTree.values());
     public Input<String> captionInput = new Input<String>("caption", "caption for tree figure", "");
 
     private TreeIntervals treeIntervals;
@@ -62,7 +62,7 @@ public class TreeDrawing extends Plugin {
     }
 
     public void initAndValidate() throws Exception {
-        if (showInternalNodeTimes.get() || showLeafTimes.get()) {
+        if (leafTimesDecorator.get() != null || internalNodeTimesDecorator.get() != null) {
             treeIntervals = new TreeIntervals(treeInput.get());
         }
         treeComponent = new TreeComponent(this);
@@ -102,14 +102,19 @@ public class TreeDrawing extends Plugin {
         treeComponent.leafDecorator = leafDecorator.get();
         treeComponent.internalNodeDecorator = internalNodeDecorator.get();
 
-        if (leafTimeLabelsInput.get() != null) {
-            String[] leafTimeLabels = leafTimeLabelsInput.get().split(",");
-            treeComponent.setLeafTimeLabels(leafTimeLabels);
+        if (leafTimesDecorator.get() != null) {
+            treeComponent.leafTimesDecorator = leafTimesDecorator.get();
         }
-        treeComponent.setLeafTimeLabelFontSize(leafTimeLabelsFontSizeInput.get());
+        if (internalNodeTimesDecorator.get() != null) {
+            treeComponent.internalNodeTimesDecorator = internalNodeTimesDecorator.get();
+        }
 
-        if (rotateTreeInput.get()) {
-            TreeUtils.rotateNodeByComparator(treeComponent.tree.getRoot(), TreeUtils.createNodeDensityMinNodeHeightComparator());
+        if (rotateTreeInput.get() != null) {
+            if (rotateTreeInput.get() == RotateTree.ladderizeLeft) {
+                TreeUtils.rotateNodeByComparator(treeComponent.tree.getRoot(), TreeUtils.createReverseNodeDensityMinNodeHeightComparator());
+            } else if (rotateTreeInput.get() == RotateTree.ladderizeRight) {
+                TreeUtils.rotateNodeByComparator(treeComponent.tree.getRoot(), TreeUtils.createNodeDensityMinNodeHeightComparator());
+            }
         }
 
         String caption = captionInput.get();
@@ -130,21 +135,10 @@ public class TreeDrawing extends Plugin {
         return branchLabelsInput.get();
     }
 
-    public double getLabelOffset() {
-        return labelOffsetInput.get();
-    }
-
-    public boolean showInternalNodeTimes() {
-        return showInternalNodeTimes.get();
-    }
-
-    public boolean showLeafTimes() {
-        return showLeafTimes.get();
-    }
-
-    public boolean showLeafNodes() {
+    public boolean showLeafLabels() {
         return showLeafLabelsInput.get();
     }
+
 
     public double getLineThickness() {
         return lineThicknessInput.get();
