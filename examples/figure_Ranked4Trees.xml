@@ -1,7 +1,7 @@
 <beast version='2.0'
        namespace='beast.core:beast.evolution.alignment:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood'>
 
-    <!-- figure 2.2 for BEAST book -->
+    <!-- figure 2.3 for BEAST book -->
 
     <taxonset spec='TaxonSet' id='taxonset'>
         <taxon spec='Taxon' id='A'/>

@@ -1,0 +1,39 @@
+<beast version='2.0'
+       namespace='beast.core:beast.evolution.alignment:beast.evolution.tree.coalescent:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood'>
+
+    <!-- figure 2.4 for Beast 2 book -->
+
+    <!-- seed should be set to 5 -->
+
+    <taxonset spec='TaxonSet' id='taxonset'>
+        <taxon spec='Taxon' id='A'/>
+        <taxon spec='Taxon' id='B'/>
+        <taxon spec='Taxon' id='C'/>
+        <taxon spec='Taxon' id='D'/>
+        <taxon spec='Taxon' id='E'/>
+        <taxon spec='Taxon' id='F'/>
+        <taxon spec='Taxon' id='G'/>
+    </taxonset>
+
+    <treeDrawing spec='beast.app.draw.tree.TreeDrawing' id='treeDrawing' orientation="right" showLeafLabels="false"
+                 lineThickness="1.25" rotateTree="ladderizeRight">
+        <leafTimesDecorator spec='beast.app.draw.tree.NodeTimesDecorator' labels="$t_7=0$" fontSize="normalsize"/>
+        <internalNodeTimesDecorator spec='beast.app.draw.tree.NodeTimesDecorator'
+                                    labels="$t_6$,$t_5$,$t_4$,$t_3$,$t_2$,$t_1$" fontSize="normalsize"/>
+
+        <tree spec='beast.evolution.tree.RandomTree'>
+
+            <taxonset idref='taxonset'/>
+
+            <populationModel spec='ConstantPopulation'>
+                <popSize spec='parameter.RealParameter' value='1.33'/>
+            </populationModel>
+        </tree>
+    </treeDrawing>
+
+    <run spec='beast.app.draw.tree.TikzTreeGrid' fileName="figure_CoalescentTree.tex" width="300"
+         height="200" debug="false" pdflatexPath="/usr/texbin/pdflatex">
+        <treeDrawing idref="treeDrawing"/>
+    </run>
+</beast>
+

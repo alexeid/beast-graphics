@@ -30,17 +30,18 @@
         </input>
     </tree>
 
-    <run spec='beast.app.draw.tree.TikzTreeGrid' fileName="figure_RelaxedClockTikzTree.tex" width="150" height="150"
+    <run spec='beast.app.draw.tree.TikzTreeGrid' fileName="figure_RelaxedClockTikzTree.tex" width="140" height="140"
          oneScale="true"
          strideLength="2"
-         isHorizontalStride="true" columnSpacer="60" pdflatexPath="/usr/texbin/pdflatex">
+         isHorizontalStride="true" columnSpacer="50" pdflatexPath="/usr/texbin/pdflatex">
 
         <treeDrawing spec='beast.app.draw.tree.TreeDrawing' showLeafLabels="true" lineThickness="1.25"
                      leafLabelOffset="10" branchLabels="&amp;rate" orientation="down">
             <tree idref="tree"/>
-            <leafTimesDecorator spec='beast.app.draw.tree.NodeTimesDecorator' showLines="true" showLabels="true"/>
+            <leafTimesDecorator spec='beast.app.draw.tree.NodeTimesDecorator' showLines="true" showLabels="true"
+                                fontSize="scriptsize"/>
             <internalNodeTimesDecorator spec='beast.app.draw.tree.NodeTimesDecorator' showLines="true"
-                                        showLabels="true"/>
+                                        showLabels="true" fontSize="scriptsize"/>
         </treeDrawing>
         <treeDrawing spec='beast.app.draw.tree.TreeDrawing' showLeafLabels="true"
                      lineThickness="1.25" leafLabelOffset="10" orientation="down">

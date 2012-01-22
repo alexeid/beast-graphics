@@ -341,8 +341,8 @@ public class TreeComponent extends JComponent {
                 g.draw(new Line2D.Double(p1, p2));
             }
             if (decorator.showNodeTimeLabels()) {
-                String nodeTimelabel = decorator.getCurrentLabel(label);
-                drawString(nodeTimelabel, p2.getX(), p2.getY(), orientation.getNodeHeightLabelAnchor(),
+                String nodeTimeLabel = decorator.getCurrentLabel(label);
+                drawString(nodeTimeLabel, p2.getX(), p2.getY(), orientation.getNodeHeightLabelAnchor(),
                         decorator.getNodeTimeLabelFontSize().getTikzRenderingHint(), g);
                 decorator.incrementCurrent();
             }
