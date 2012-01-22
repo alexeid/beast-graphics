@@ -33,8 +33,8 @@
 
     <treeDrawing spec='beast.app.draw.tree.TreeDrawing' id='treeDrawing' orientation="right" showLeafLabels="false"
                  lineThickness="1" rotateTree="ladderizeRight">
-        <leafDecorator spec="beast.app.draw.tree.NodeDecorator" nodeShape="circle" nodeColor="255,255,0" nodeSize="4"/>
-        <internalNodeDecorator spec="beast.app.draw.tree.NodeDecorator" nodeShape="circle" nodeColor="255,0,0"
+        <leafDecorator spec="beast.app.draw.tree.NodeDecorator" nodeShape="circle" nodeColor="red" nodeSize="4"/>
+        <internalNodeDecorator spec="beast.app.draw.tree.NodeDecorator" nodeShape="circle" nodeColor="yellow"
                                nodeSize="4"/>
         <leafTimesDecorator spec='beast.app.draw.tree.NodeTimesDecorator' labels="$t_0$,$t_1$,$t_2$"/>
 
