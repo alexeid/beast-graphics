@@ -36,6 +36,20 @@ public interface NodePositioningRule {
         }
     };
 
+    public NodePositioningRule FIRST_CHILD = new NodePositioningRule() {
+        @Override
+        public TraversalOrder getTraversalOrder() {
+            return TraversalOrder.POST_ORDER;
+        }
+
+        @Override
+        public void setPosition(Node node, String positionLabel) {
+
+            node.setMetaData(positionLabel, node.getChildren().get(0).getMetaData(positionLabel));
+        }
+    };
+
+
     public NodePositioningRule TRIANGULATED = new NodePositioningRule() {
         @Override
         public TraversalOrder getTraversalOrder() {

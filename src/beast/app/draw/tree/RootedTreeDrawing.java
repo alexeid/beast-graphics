@@ -15,14 +15,12 @@ import java.util.Arrays;
  * @author Alexei Drummond
  */
 
-@Description("Encapsulates a tree and options to draw it within the context of a TikzTreeFigure.")
+@Description("Encapsulates a rooted tree and options to draw it within the context of a TreeDrawingGrid.")
 public class RootedTreeDrawing extends AbstractTreeDrawing {
 
     enum TreeOrientation {up, down, left, right}
-
     enum TreeBranchStyle {line, square}
-
-    enum NodePosition {average, triangulated}
+    enum NodePosition {average, triangulated, firstChild}
 
     public Input<TreeOrientation> treeOrientationInput = new Input<TreeOrientation>("orientation", "The orientation of the tree. Valid values are " +
             Arrays.toString(TreeOrientation.values()) + " (default 'right')", TreeOrientation.right, TreeOrientation.values());
@@ -43,7 +41,8 @@ public class RootedTreeDrawing extends AbstractTreeDrawing {
     }
 
     public RootedTreeDrawing(Tree tree) throws Exception {
-        init(tree);
+        treeInput.setValue(tree, this);
+        initAndValidate();
     }
 
     public void initAndValidate() throws Exception {
@@ -82,6 +81,8 @@ public class RootedTreeDrawing extends AbstractTreeDrawing {
             case triangulated:
                 treeComponent.positioningRule = NodePositioningRule.TRIANGULATED;
                 break;
+            case firstChild:
+                treeComponent.positioningRule = NodePositioningRule.FIRST_CHILD;
         }
 
         treeComponent.leafDecorator = leafDecorator.get();

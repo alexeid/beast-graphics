@@ -42,7 +42,6 @@ public class TreeComponent extends JComponent {
     NumberFormat format = NumberFormat.getInstance();
 
     double rootHeightForScale;
-    private boolean drawAxis = true;
 
     private Rectangle2D bounds = new Rectangle2D.Double(0, 0, 1, 1);
 
@@ -144,7 +143,7 @@ public class TreeComponent extends JComponent {
         //g.setFont(oldFont);
     }
 
-    void drawCanonicalString(String string, double x, double y, Object anchor, Object fontSize, Graphics2D g) {
+    void drawCanonicalString(String string, double x, double y, Object anchor, Object fontSize, SmartGraphics2D g) {
 
         Point2D p = getTransformedPoint2D(new Point2D.Double(x, y));
 
@@ -330,10 +329,6 @@ public class TreeComponent extends JComponent {
             oldIntervalType = newIntervalType;
         }
         g.setStroke(s);
-
-        if (drawAxis) {
-
-        }
     }
 
     void drawNodeTime(String label, NodeTimesDecorator decorator, double canonicalHeight, double pos1, double pos2, Graphics2D g) {
@@ -355,7 +350,12 @@ public class TreeComponent extends JComponent {
 
     public void paintComponent(Graphics g) {
 
-        Graphics2D g2d = (Graphics2D) g;
+        Graphics2D g2d;
+        if (!(g instanceof TikzGraphics2D)) {
+            g2d = new SmartGraphics2D((Graphics2D)g);
+        } else {
+            g2d = (Graphics2D)g;
+        }
 
         Tree tree = treeDrawing.getTree();
 
@@ -375,12 +375,26 @@ public class TreeComponent extends JComponent {
 
         Alignment alignment = new Alignment(sequences, 4, "nucleotide");
 
-        TreeComponent treeComponent = new TreeComponent(new RootedTreeDrawing(new TreeParser(alignment, newickTree)));
+        RootedTreeDrawing treeDrawing = new RootedTreeDrawing(new TreeParser(alignment, newickTree));
+        treeDrawing.leafLabelOffsetInput.setValue(10.0,treeDrawing);
+        treeDrawing.treeOrientationInput.setValue(RootedTreeDrawing.TreeOrientation.left,treeDrawing);
+        treeDrawing.showLeafLabelsInput.setValue(true, treeDrawing);
+        treeDrawing.initAndValidate();
+        TreeComponent treeComponent = treeDrawing.treeComponent;
+       
 
         TikzGraphics2D tikzGraphics2D = new TikzGraphics2D();
-        treeComponent.setSize(new Dimension(100, 100));
         treeComponent.paintComponent(tikzGraphics2D);
         tikzGraphics2D.flush();
+        
+        JFrame frame = new JFrame();
+        frame.getContentPane().add(treeComponent, BorderLayout.CENTER);
+        frame.setSize(500,500);
+
+        treeComponent.setBounds(new Rectangle2D.Double(50,50,400,400));
+
+        
+        frame.setVisible(true);
     }
 
     public void setCaption(String caption) {
