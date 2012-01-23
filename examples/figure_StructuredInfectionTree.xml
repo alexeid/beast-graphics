@@ -73,6 +73,12 @@
         </input>
     </tree>
 
+    <colorTable id='traitColorTable' spec='beast.app.draw.tree.ColorTable'>
+        <color spec='beast.app.draw.tree.ColorPlugin' color="pink"/>
+        <color spec='beast.app.draw.tree.ColorPlugin' color="green"/>
+        <color spec='beast.app.draw.tree.ColorPlugin' color="127,127,255"/>
+    </colorTable>
+
     <run spec='beast.app.draw.tree.TreeDrawingGrid' fileName="figure_StructuredInfectionTree.tex" width="300"
          height="300"
          oneScale="true"
@@ -81,7 +87,8 @@
 
         <treeDrawing spec='beast.app.draw.tree.RootedTreeDrawing' showLeafLabels="false"
                      lineThickness="1.25" leafLabelOffset="10" orientation="right" branchStyle="square"
-                     nodePositioning="average" colorByTrait="&amp;state">
+                     nodePositioning="average" colorTrait="&amp;state">
+            <traitColorTable idref='traitColorTable'/>
             <tree idref="tree"/>
         </treeDrawing>
     </run>

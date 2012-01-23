@@ -15,6 +15,7 @@ import java.awt.*;
 import java.awt.geom.*;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -47,6 +48,7 @@ public class TreeComponent extends JComponent {
 
     static final Color[] traitColors = {Color.red, Color.blue, Color.green, Color.yellow, Color.orange, Color.magenta,
             Color.cyan, Color.gray, Color.darkGray, Color.lightGray, Color.black};
+    private ColorTable traitColorTable = new ColorTable(Arrays.asList(traitColors));
 
 
     /**
@@ -189,7 +191,7 @@ public class TreeComponent extends JComponent {
                 drawNode(getTransformedNodePoint2D(node), g, NodeDecorator.BLACK_DOT);
             }
 
-            g.setColor(traitColors[childColorIndex]);
+            g.setColor(traitColorTable.getColor(childColorIndex));
         }
 
         Shape shape = branchStyle.getBranchShape(getCanonicalNodePoint2D(childNode), getCanonicalNodePoint2D(node));
@@ -403,6 +405,10 @@ public class TreeComponent extends JComponent {
 
     public void setColorTraitName(String colorTraitName) {
         this.colorTraitName = colorTraitName;
+    }
+
+    public void setTraitColorTable(ColorTable colorTable) {
+        this.traitColorTable = colorTable;
     }
 }
 

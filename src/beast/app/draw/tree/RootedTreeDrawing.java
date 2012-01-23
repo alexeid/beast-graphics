@@ -32,7 +32,8 @@ public class RootedTreeDrawing extends AbstractTreeDrawing {
     public Input<NodeTimesDecorator> leafTimesDecorator = new Input<NodeTimesDecorator>("leafTimesDecorator", "options for how to display leaf times");
     public Input<NodeTimesDecorator> internalNodeTimesDecorator = new Input<NodeTimesDecorator>("internalNodeTimesDecorator", "options for how to display internal node times");
 
-    public Input<String> colorByTrait = new Input<String>("colorByTrait", "The trait name to use for coloring");
+    public Input<String> colorByTrait = new Input<String>("colorTrait", "The trait name to use for color index");
+    public Input<ColorTable> traitColorTable = new Input<ColorTable>("traitColorTable", "The color table to map colorTrait index to colors");
 
     private TreeIntervals treeIntervals;
     TreeComponent treeComponent;
@@ -121,6 +122,9 @@ public class RootedTreeDrawing extends AbstractTreeDrawing {
 
         if (colorByTrait.get() != null) {
             treeComponent.setColorTraitName(colorByTrait.get());
+        }
+        if (traitColorTable.get() != null) {
+            treeComponent.setTraitColorTable(traitColorTable.get());
         }
     }
 
