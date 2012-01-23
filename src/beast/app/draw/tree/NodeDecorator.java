@@ -48,6 +48,26 @@ public class NodeDecorator extends Plugin {
         }
     }
 
+    public static final NodeDecorator BLACK_DOT = new NodeDecorator() {
+        public Color getNodeColor() {
+            return Color.black;
+        }
+
+        public double getNodeSize() {
+            return 4;
+        }
+
+        public NodeShape getNodeShape() {
+            return NodeShape.circle;
+        }
+
+        public boolean drawNodeShape() {
+            return false;
+        }
+
+    };
+
+
     public NodeDecorator() {
     }
 
@@ -85,5 +105,9 @@ public class NodeDecorator extends Plugin {
 
     public NodeShape getNodeShape() {
         return nodeShapeInput.get();
+    }
+
+    public boolean drawNodeShape() {
+        return true;
     }
 }

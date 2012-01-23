@@ -2,6 +2,7 @@ package beast.app.draw.tree;
 
 import beast.core.Description;
 import beast.core.Input;
+import beast.evolution.tree.Node;
 import beast.evolution.tree.Tree;
 import beast.evolution.tree.TreeUtils;
 import beast.evolution.tree.coalescent.TreeIntervals;
@@ -32,6 +33,8 @@ public class RootedTreeDrawing extends AbstractTreeDrawing {
 
     public Input<NodeTimesDecorator> leafTimesDecorator = new Input<NodeTimesDecorator>("leafTimesDecorator", "options for how to display leaf times");
     public Input<NodeTimesDecorator> internalNodeTimesDecorator = new Input<NodeTimesDecorator>("internalNodeTimesDecorator", "options for how to display internal node times");
+
+    public Input<String> colorByTrait = new Input<String>("colorByTrait", "The trait name to use for coloring");
 
     private TreeIntervals treeIntervals;
     TreeComponent treeComponent;
@@ -100,6 +103,23 @@ public class RootedTreeDrawing extends AbstractTreeDrawing {
         String caption = captionInput.get();
         if (caption != null && !caption.equals("")) {
             treeComponent.setCaption(caption);
+        }
+
+        // escape underscores unless the name has a $ on either side
+        for (Node child : getTree().getExternalNodes()) {
+
+            String id = child.getID();
+
+            if (id.contains("$") && id.substring(id.indexOf("$") + 1).contains("$")) {
+                // DO NOTHING -- THERE IS AT LEAST ONE MATH REGION IN THE NAME
+            } else {
+                //escape the underscores as the name is not in a math context
+                child.setID(child.getID().replace("_", "\\_"));
+            }
+        }
+
+        if (colorByTrait.get() != null) {
+            treeComponent.setColorTraitName(colorByTrait.get());
         }
     }
 

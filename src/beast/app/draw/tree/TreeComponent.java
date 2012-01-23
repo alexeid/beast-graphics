@@ -32,6 +32,7 @@ public class TreeComponent extends JComponent {
     NodeTimesDecorator internalNodeTimesDecorator;
 
     String caption = null;
+    String colorTraitName = null;
 
     Tree tree;
 
@@ -44,6 +45,10 @@ public class TreeComponent extends JComponent {
     private boolean drawAxis = true;
 
     private Rectangle2D bounds = new Rectangle2D.Double(0, 0, 1, 1);
+
+    static final Color[] traitColors = {Color.red, Color.blue, Color.green, Color.yellow, Color.orange, Color.magenta,
+            Color.cyan, Color.gray, Color.darkGray, Color.lightGray, Color.black};
+
 
     /**
      * @param treeDrawing the  tree drawing
@@ -132,7 +137,9 @@ public class TreeComponent extends JComponent {
         g.setColor(decorator.getNodeColor());
         g.fill(shape);
         g.setColor(oldColor);
-        g.draw(shape);
+        if (decorator.drawNodeShape()) {
+            g.draw(shape);
+        }
 
         //g.setFont(oldFont);
     }
@@ -173,6 +180,18 @@ public class TreeComponent extends JComponent {
     }
 
     final void drawBranch(Node node, Node childNode, Graphics2D g) {
+
+        if (colorTraitName != null) {
+            int childColorIndex = (int) Math.round((Double) childNode.getMetaData(colorTraitName));
+            int parentColorIndex = (int) Math.round((Double) node.getMetaData(colorTraitName));
+
+            if (childColorIndex == parentColorIndex && node.getChildCount() == 1) {
+                System.out.println("Parent and single child have same state!!");
+                drawNode(getTransformedNodePoint2D(node), g, NodeDecorator.BLACK_DOT);
+            }
+
+            g.setColor(traitColors[childColorIndex]);
+        }
 
         Shape shape = branchStyle.getBranchShape(getCanonicalNodePoint2D(childNode), getCanonicalNodePoint2D(node));
         Shape transformed = orientation.getTransform(bounds).createTransformedShape(shape);
@@ -366,6 +385,10 @@ public class TreeComponent extends JComponent {
 
     public void setCaption(String caption) {
         this.caption = caption;
+    }
+
+    public void setColorTraitName(String colorTraitName) {
+        this.colorTraitName = colorTraitName;
     }
 }
 
