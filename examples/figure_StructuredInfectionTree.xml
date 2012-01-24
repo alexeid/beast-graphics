@@ -86,7 +86,7 @@
          isHorizontalStride="true" columnSpacer="40" rowSpacer="40" debug="false" pdflatexPath="/usr/texbin/pdflatex">
 
         <treeDrawing spec='beast.app.draw.tree.RootedTreeDrawing' showLeafLabels="false"
-                     lineThickness="1.25" leafLabelOffset="10" orientation="right" branchStyle="square"
+                     lineThickness="1.25" leafLabelOffset="10" orientation="left" branchStyle="square"
                      nodePositioning="average" colorTrait="&amp;state">
             <traitColorTable idref='traitColorTable'/>
             <tree idref="tree"/>
