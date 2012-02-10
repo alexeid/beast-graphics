@@ -183,8 +183,9 @@ public class TreeComponent extends JComponent {
     final void drawBranch(Node node, Node childNode, Graphics2D g) {
 
         if (colorTraitName != null) {
-            int childColorIndex = (int) Math.round((Double) childNode.getMetaData(colorTraitName));
-            int parentColorIndex = (int) Math.round((Double) node.getMetaData(colorTraitName));
+            int childColorIndex = getIntegerTrait(childNode, colorTraitName);
+
+            int parentColorIndex = getIntegerTrait(node, colorTraitName);
 
             if (childColorIndex == parentColorIndex && node.getChildCount() == 1) {
                 System.out.println("Parent and single child have same state!!");
@@ -198,6 +199,14 @@ public class TreeComponent extends JComponent {
         Shape transformed = orientation.getTransform(bounds).createTransformedShape(shape);
 
         g.draw(transformed);
+    }
+
+    private int getIntegerTrait(Node childNode, String traitName) {
+        Object trait = childNode.getMetaData(traitName);
+        if (trait instanceof Integer) return (Integer) trait;
+        if (trait instanceof Double) return (int) Math.round((Double) trait);
+        if (trait instanceof String) return (int) Math.round(Double.parseDouble((String) trait));
+        return -1;
     }
 
 
@@ -354,9 +363,9 @@ public class TreeComponent extends JComponent {
 
         Graphics2D g2d;
         if (!(g instanceof TikzGraphics2D)) {
-            g2d = new SmartGraphics2D((Graphics2D)g);
+            g2d = new SmartGraphics2D((Graphics2D) g);
         } else {
-            g2d = (Graphics2D)g;
+            g2d = (Graphics2D) g;
         }
 
         Tree tree = treeDrawing.getTree();
@@ -378,24 +387,24 @@ public class TreeComponent extends JComponent {
         Alignment alignment = new Alignment(sequences, 4, "nucleotide");
 
         RootedTreeDrawing treeDrawing = new RootedTreeDrawing(new TreeParser(alignment, newickTree));
-        treeDrawing.leafLabelOffsetInput.setValue(10.0,treeDrawing);
-        treeDrawing.treeOrientationInput.setValue(RootedTreeDrawing.TreeOrientation.left,treeDrawing);
+        treeDrawing.leafLabelOffsetInput.setValue(10.0, treeDrawing);
+        treeDrawing.treeOrientationInput.setValue(RootedTreeDrawing.TreeOrientation.left, treeDrawing);
         treeDrawing.showLeafLabelsInput.setValue(true, treeDrawing);
         treeDrawing.initAndValidate();
         TreeComponent treeComponent = treeDrawing.treeComponent;
-       
+
 
         TikzGraphics2D tikzGraphics2D = new TikzGraphics2D();
         treeComponent.paintComponent(tikzGraphics2D);
         tikzGraphics2D.flush();
-        
+
         JFrame frame = new JFrame();
         frame.getContentPane().add(treeComponent, BorderLayout.CENTER);
-        frame.setSize(500,500);
+        frame.setSize(500, 500);
 
-        treeComponent.setBounds(new Rectangle2D.Double(50,50,400,400));
+        treeComponent.setBounds(new Rectangle2D.Double(50, 50, 400, 400));
 
-        
+
         frame.setVisible(true);
     }
 
