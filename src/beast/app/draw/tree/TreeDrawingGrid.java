@@ -45,7 +45,7 @@ public class TreeDrawingGrid extends beast.core.Runnable {
 
     public void initAndValidate() {
 
-        maxRootHeight = 0;
+        maxRootHeight = -Double.MAX_VALUE;
         for (AbstractTreeDrawing drawing : treeDrawing.get()) {
 
             Tree tree = drawing.getTree();

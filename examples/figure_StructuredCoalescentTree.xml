@@ -8,10 +8,10 @@
         <color spec='beast.app.draw.tree.ColorPlugin' color="127,127,255"/>
     </colorTable>
 
-    <plate var="n" range="1,2,3,4,5,6">
+    <plate var="n" range="1,2,3,4,5,6,7,8,9">
         <treeDrawing spec='beast.app.draw.tree.RootedTreeDrawing' id='treeDrawing-$(n)' orientation="right"
                      showLeafLabels="false"
-                     lineThickness="1.5" rotateTree="ladderizeRight" colorTrait="deme">
+                     lineThickness="1.25" rotateTree="ladderizeRight" colorTrait="deme">
             <traitColorTable idref='traitColorTable'/>
 
             <tree spec='beast.evolution.tree.coalescent.StructuredCoalescentTree'>
@@ -23,10 +23,10 @@
         </treeDrawing>
     </plate>
 
-    <run spec='beast.app.draw.tree.TreeDrawingGrid' fileName="figure_StructuredCoalescentTree.tex" width="160"
-         strideLength="2" rowSpacer="20" columnSpacer="30" oneScale="true"
-         height="160" debug="false" pdflatexPath="/usr/texbin/pdflatex">
-        <plate var="n" range="1,2,3,4,5,6">
+    <run spec='beast.app.draw.tree.TreeDrawingGrid' fileName="figure_StructuredCoalescentTree.tex" width="140"
+         strideLength="3" rowSpacer="20" columnSpacer="15" oneScale="true"
+         height="140" debug="false" pdflatexPath="/usr/texbin/pdflatex">
+        <plate var="n" range="1,2,3,4,5,6,7,8,9">
             <treeDrawing idref="treeDrawing-$(n)"/>
         </plate>
     </run>
