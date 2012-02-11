@@ -8,22 +8,27 @@
         <color spec='beast.app.draw.tree.ColorPlugin' color="127,127,255"/>
     </colorTable>
 
-    <treeDrawing spec='beast.app.draw.tree.RootedTreeDrawing' id='treeDrawing' orientation="right"
-                 showLeafLabels="false"
-                 lineThickness="1.25" rotateTree="ladderizeRight" colorTrait="deme">
-        <traitColorTable idref='traitColorTable'/>
+    <plate var="n" range="1,2,3,4,5,6">
+        <treeDrawing spec='beast.app.draw.tree.RootedTreeDrawing' id='treeDrawing-$(n)' orientation="right"
+                     showLeafLabels="false"
+                     lineThickness="1.5" rotateTree="ladderizeRight" colorTrait="deme">
+            <traitColorTable idref='traitColorTable'/>
 
-        <tree spec='beast.evolution.tree.coalescent.StructuredCoalescentTree'>
+            <tree spec='beast.evolution.tree.coalescent.StructuredCoalescentTree'>
 
-            <popSizesMigrationRates spec='parameter.RealParameter' dimension="9"
-                                    value='2.0 0.5 0.5 0.5 0.5 0.5 0.5 0.5 1.0'/>
-            <sampleSizes spec='parameter.IntegerParameter' dimension="3" value='10'/>
-        </tree>
-    </treeDrawing>
+                <popSizesMigrationRates spec='parameter.RealParameter' dimension="9"
+                                        value='2.0 0.5 0.5 0.5 0.5 0.5 0.5 0.5 1.0'/>
+                <sampleSizes spec='parameter.IntegerParameter' dimension="3" value='10'/>
+            </tree>
+        </treeDrawing>
+    </plate>
 
-    <run spec='beast.app.draw.tree.TreeDrawingGrid' fileName="figure_StructuredCoalescentTree.tex" width="300"
-         height="200" debug="false" pdflatexPath="/usr/texbin/pdflatex">
-        <treeDrawing idref="treeDrawing"/>
+    <run spec='beast.app.draw.tree.TreeDrawingGrid' fileName="figure_StructuredCoalescentTree.tex" width="160"
+         strideLength="2" rowSpacer="20" columnSpacer="30" oneScale="true"
+         height="160" debug="false" pdflatexPath="/usr/texbin/pdflatex">
+        <plate var="n" range="1,2,3,4,5,6">
+            <treeDrawing idref="treeDrawing-$(n)"/>
+        </plate>
     </run>
 
 </beast>

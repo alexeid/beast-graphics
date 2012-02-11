@@ -41,7 +41,7 @@ public class TreeDrawingGrid extends beast.core.Runnable {
     /**
      * The maximum root height of trees
      */
-    private double maxRootHeight;
+    private double maxRootHeight = 0;
 
     public void initAndValidate() {
 
