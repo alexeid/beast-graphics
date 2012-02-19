@@ -87,7 +87,13 @@ public class TreeDrawingGrid extends beast.core.Runnable {
                 g.setStroke(new BasicStroke(0.5f));
                 g.setColor(Color.gray);
                 g.draw(bounds);
+                Object oldAnchorValue = g.getRenderingHint(TikzRenderingHints.KEY_NODE_ANCHOR);
+                Object oldFontSize = g.getRenderingHint(TikzRenderingHints.KEY_FONT_SIZE);
+                g.setRenderingHint(TikzRenderingHints.KEY_FONT_SIZE, TikzRenderingHints.VALUE_scriptsize);
+                g.setRenderingHint(TikzRenderingHints.KEY_NODE_ANCHOR, TikzRenderingHints.VALUE_SOUTH_WEST);
                 g.drawString(count + "", (float) bounds.getX(), (float) bounds.getY());
+                if (oldAnchorValue != null) g.setRenderingHint(TikzRenderingHints.KEY_NODE_ANCHOR, oldAnchorValue);
+                if (oldFontSize != null) g.setRenderingHint(TikzRenderingHints.KEY_FONT_SIZE, oldFontSize);
             }
 
             drawing.paintTree(g);

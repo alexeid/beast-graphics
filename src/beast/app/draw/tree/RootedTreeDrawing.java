@@ -35,6 +35,8 @@ public class RootedTreeDrawing extends AbstractTreeDrawing {
     public Input<String> colorByTrait = new Input<String>("colorTrait", "The trait name to use for color index");
     public Input<ColorTable> traitColorTable = new Input<ColorTable>("traitColorTable", "The color table to map colorTrait index to colors");
 
+    public Input<Boolean> rootAlignedInput = new Input<Boolean>("isRootAligned", "true if the trees should be aligned by root instead of tips (default is false).", false);
+    
     private TreeIntervals treeIntervals;
     TreeComponent treeComponent;
 
@@ -154,4 +156,9 @@ public class RootedTreeDrawing extends AbstractTreeDrawing {
     public boolean showLeafLabels() {
         return showLeafLabelsInput.get();
     }
+
+    public boolean isRootAligned() {
+        return rootAlignedInput.get();
+    }
+
 }

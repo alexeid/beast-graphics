@@ -165,7 +165,14 @@ public class TreeComponent extends JComponent {
     }
 
     private double getCanonicalNodeY(double height) {
-        return height / rootHeightForScale;
+        
+        double h = height / rootHeightForScale;
+        
+        if (treeDrawing.isRootAligned()) {
+            h = h + (1.0-(tree.getRoot().getHeight()/rootHeightForScale));
+        }
+        
+        return h;
     }
 
     private double getCanonicalNodeSpacing(Tree tree) {
