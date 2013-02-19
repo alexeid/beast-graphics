@@ -1,0 +1,57 @@
+<beast version='2.0'
+       namespace='beast.core:beast.evolution.alignment:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood'>
+
+    <!-- figure 2.2 for BEAST book -->
+
+    <taxonset spec='TaxonSet' id='taxonset'>
+		<taxon spec="Taxon" id='taxon_1'/>
+		<taxon spec="Taxon" id='taxon_2'/>
+		<taxon spec="Taxon" id='taxon_3'/>
+		<taxon spec="Taxon" id='taxon_4'/>
+		<taxon spec="Taxon" id='taxon_5'/>
+		<taxon spec="Taxon" id='taxon_6'/>
+		<taxon spec="Taxon" id='taxon_7'/>
+		<taxon spec="Taxon" id='taxon_8'/>
+		<taxon spec="Taxon" id='taxon_9'/>
+		<taxon spec="Taxon" id='taxon_10'/>
+		<taxon spec="Taxon" id='taxon_11'/>
+		<taxon spec="Taxon" id='taxon_12'/>
+		<taxon spec="Taxon" id='taxon_13'/>
+		<taxon spec="Taxon" id='taxon_14'/>
+		<taxon spec="Taxon" id='taxon_15'/>
+    </taxonset>
+
+
+    <tree spec='beast.util.TreeParser' id='yuletree'>
+        <taxonset idref='taxonset'/>
+        <input name='newick'>(((((11:0.6386417876314754,3:0.6386417876314754):1.6400594791466396,(5:2.2521785723063243,((6:0.008801352144399586,15:0.008801352144399586):2.213902428277536,2:2.222703780421936):0.029474791884388486):0.026522694471790422):4.101909883714338,((9:0.09555898454523601,4:0.09555898454523601):3.68648575214904,8:3.7820447366942767):2.598566413798178):4.678019918170667,(12:4.440059155863547,(10:4.312217575193087,(7:3.6512083640261044,1:3.6512083640261044):0.6610092111669837):0.1278415806704595):6.618571912799575):3.9413689313368754,(14:4.978285729029681,13:4.978285729029681):10.021714270970318);
+        </input>
+    </tree>
+
+    <tree spec='beast.util.TreeParser' id='coalescenttree'>
+        <taxonset idref='taxonset'/>
+        <input name='newick'>
+(((7:5.0,(9:0.01,(10:0.01,((11:0.01,8:0.01):0.01,5:0.01):0.01):0.01):5.0):2.0,((3:0.01,6:0.01):6.0,13:6.0):1.0):9.0,((1:0.01,(4:0.01,14:0.01):0.01):0.01,(2:0.01,(12:0.01,15:0.01):0.01):0.01):16.0):0.0;
+        </input>
+    </tree>
+
+
+    <run spec='beast.app.draw.tree.TreeDrawingGrid' fileName="figure_YuleVsCoalescent.tex" width="75" height="75"
+         oneScale="true"
+         strideLength="3" captionPosition="north"
+         isHorizontalStride="true" columnSpacer="58" rowSpacer="30" pdflatexPath="/usr/bin/pdflatex">
+
+        <treeDrawing spec='beast.app.draw.tree.RootedTreeDrawing' showLeafLabels="false"
+                     lineThickness="1.25" leafLabelOffset="10" 
+                     orientation="down" nodePositioning="triangulated" branchStyle="line" caption="(a) Yule tree">
+            <tree idref="yuletree"/>
+        </treeDrawing>
+        <treeDrawing spec='beast.app.draw.tree.RootedTreeDrawing' showLeafLabels="false"
+                     lineThickness="1.25" leafLabelOffset="10" orientation="down"
+                     nodePositioning="triangulated" branchStyle="line" caption="(b) Coalescent tree">
+            <tree idref="coalescenttree"/>
+        </treeDrawing>
+
+    </run>
+</beast>
+
