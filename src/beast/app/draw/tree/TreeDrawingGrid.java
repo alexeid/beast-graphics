@@ -14,6 +14,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * @author Alexei Drummond
@@ -149,6 +150,7 @@ public class TreeDrawingGrid extends beast.core.Runnable {
                 }
             }
         }
+        Logger.getLogger("beast-graphics").exiting(this.getClass().getName(), "paint");
     }
 
     public void run() throws IOException, InterruptedException {

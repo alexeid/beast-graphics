@@ -1,0 +1,45 @@
+<beast version='2.0'
+       namespace='beast.core:beast.evolution.alignment:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.tree:beast.evolution.likelihood'>
+
+    <!-- figure 2.2 for BEAST book -->
+
+    <taxonset spec='TaxonSet' id='taxonset'>
+        <taxon spec='Taxon' id='A'/>
+        <taxon spec='Taxon' id='B'/>
+        <taxon spec='Taxon' id='C'/>
+    </taxonset>
+
+    <trait id='traitset' spec='beast.evolution.tree.TraitSet' traitname='date-forward' units='day'
+           value='
+		A  = 2.0,
+		B  = 1.0,
+		C  = 0.0'>
+        <taxa idref='taxonset'/>
+    </trait>
+
+    <tree spec='SampledAncestorTree' id='tree-1'>
+        <taxonset idref='taxonset'/>
+        <trait idref='traitset'/>
+    </tree>
+
+
+    <run spec='beast.app.draw.tree.TreeDrawingGrid' fileName="figure_DirectAncestors.tex" width="300" height="300"
+         oneScale="true"
+         strideLength="4" captionPosition="north"
+         isHorizontalStride="true" columnSpacer="1" rowSpacer="1" pdflatexPath="/usr/texbin/pdflatex">
+
+        <plate var="n" range="1">
+            <treeDrawing spec='beast.app.draw.tree.RootedTreeDrawing' showLeafLabels="true"
+                         lineThickness="0.01" leafLabelOffset="10"
+                         orientation="down"
+
+                         branchStyle="square">
+                <tree idref="tree-$(n)"/>
+                <leafDecorator spec="beast.app.draw.tree.NodeDecorator" nodeShape="circle" nodeSize="4">
+                    <fillColor spec="beast.app.draw.tree.ColorPlugin" color="black"/>
+                </leafDecorator>
+            </treeDrawing>
+        </plate>
+    </run>
+</beast>
+

@@ -231,7 +231,7 @@ public class TikzGraphics2D extends AbstractGraphicsInterface {
         double rh = height / 2.0;
         double cx = x + rw;
         double cy = y + rh;
-        addCommand("\\" + (fill ? "fill" : "draw") + handleOptions() + " (" + cx + "pt, " + cy + "pt) ellipse (" + rw + "pt and " + rh + "pt);");
+        addCommand("\\" + (fill ? "fill" : "draw") + handleOptions() + " (" + format.format(cx) + "pt, " + format.format(cy) + "pt) ellipse (" + format.format(rw) + "pt and " + format.format(rh) + "pt);");
     }
 
     protected void handleArc(double x, double y, double width, double height, int startAngle, int arcAngle, boolean fill) {

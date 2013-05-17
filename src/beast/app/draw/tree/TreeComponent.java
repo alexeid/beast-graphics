@@ -14,13 +14,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.*;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * @author Alexei Drummond
@@ -54,47 +50,47 @@ public class TreeComponent extends JComponent {
             Color.cyan, Color.gray, Color.darkGray, Color.lightGray, Color.black};
     private ColorTable traitColorTable = new ColorTable(Arrays.asList(traitColors));
 
-    
+
     private class Location {
         int[] loc;
-        
+
         public Location(int[] loc) {
             this.loc = new int[loc.length];
-            
-            for (int i=0; i<loc.length; i++)
+
+            for (int i = 0; i < loc.length; i++)
                 this.loc[i] = loc[i];
         }
-        
+
         @Override
         public boolean equals(Object object) {
-            
+
             if (!(object instanceof Location))
                 return false;
-            
-            Location otherLocation = (Location)object;
+
+            Location otherLocation = (Location) object;
 
             if (loc.length != otherLocation.loc.length)
                 return false;
-            
-            for (int i=0; i<loc.length; i++)
+
+            for (int i = 0; i < loc.length; i++)
                 if (loc[i] != otherLocation.loc[i])
                     return false;
-            
+
             return true;
         }
 
         @Override
         public int hashCode() {
             int hash = 7;
-            hash = 83*hash+Arrays.hashCode(this.loc);
+            hash = 83 * hash + Arrays.hashCode(this.loc);
             return hash;
         }
-        
+
     }
-    
+
     Map<Location, Integer> locationColours;
     int nextLocationColour;
-    
+
     /**
      * @param treeDrawing the  tree drawing
      */
@@ -211,13 +207,13 @@ public class TreeComponent extends JComponent {
     }
 
     private double getCanonicalNodeY(double height) {
-        
+
         double h = height / rootHeightForScale;
-        
+
         if (treeDrawing.isRootAligned()) {
-            h = h + (1.0-(tree.getRoot().getHeight()/rootHeightForScale));
+            h = h + (1.0 - (tree.getRoot().getHeight() / rootHeightForScale));
         }
-        
+
         return h;
     }
 
@@ -259,9 +255,9 @@ public class TreeComponent extends JComponent {
         if (trait instanceof Integer) return (Integer) trait;
         if (trait instanceof Double) return (int) Math.round((Double) trait);
         if (trait instanceof String) return (int) Math.round(Double.parseDouble((String) trait));
-        
+
         if (trait instanceof int[]) {
-            Location location = new Location((int[])trait);
+            Location location = new Location((int[]) trait);
             if (locationColours.containsKey(location))
                 return locationColours.get(location);
             else {
@@ -269,7 +265,7 @@ public class TreeComponent extends JComponent {
                 return nextLocationColour++;
             }
         }
-        
+
         return -1;
     }
 
@@ -435,6 +431,7 @@ public class TreeComponent extends JComponent {
         Tree tree = treeDrawing.getTree();
 
         draw(treeDrawing, tree.getRoot(), g2d);
+        Logger.getLogger("beast-graphics").exiting(this.getClass().getName(), "paintComponent");
     }
 
     public static void main(String[] args) throws Exception {

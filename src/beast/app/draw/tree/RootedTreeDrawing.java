@@ -10,6 +10,7 @@ import beast.evolution.tree.coalescent.TreeIntervals;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 /**
  * @author Alexei Drummond
@@ -19,7 +20,9 @@ import java.util.Arrays;
 public class RootedTreeDrawing extends AbstractTreeDrawing {
 
     enum TreeOrientation {up, down, left, right}
+
     enum TreeBranchStyle {line, square}
+
     enum NodePosition {average, triangulated, firstChild}
 
     public Input<TreeOrientation> treeOrientationInput = new Input<TreeOrientation>("orientation", "The orientation of the tree. Valid values are " +
@@ -36,7 +39,7 @@ public class RootedTreeDrawing extends AbstractTreeDrawing {
     public Input<ColorTable> traitColorTable = new Input<ColorTable>("traitColorTable", "The color table to map colorTrait index to colors");
 
     public Input<Boolean> rootAlignedInput = new Input<Boolean>("isRootAligned", "true if the trees should be aligned by root instead of tips (default is false).", false);
-    
+
     private TreeIntervals treeIntervals;
     TreeComponent treeComponent;
 
@@ -138,6 +141,7 @@ public class RootedTreeDrawing extends AbstractTreeDrawing {
     @Override
     public void paintTree(Graphics2D g) {
         treeComponent.paint(g);
+        Logger.getLogger("beast-graphics").exiting(this.getClass().getName(), "paintTree");
     }
 
     @Override

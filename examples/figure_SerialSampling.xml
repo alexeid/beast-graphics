@@ -1,0 +1,71 @@
+<beast version='2.0'
+       namespace='beast.core:beast.evolution.alignment:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood'>
+
+    <!-- figure 2.3 for BEAST book -->
+
+    <taxonset spec='TaxonSet' id='taxonset'>
+        <taxon spec='Taxon' id='A'/>
+        <taxon spec='Taxon' id='B'/>
+        <taxon spec='Taxon' id='C'/>
+        <taxon spec='Taxon' id='D'/>
+    </taxonset>
+
+
+    <!-- COL 1 -->
+
+    <tree spec='beast.util.TreeParser' id='initial-tree-1'>
+        <taxonset idref='taxonset'/>
+        <input name='newick'>
+            (A:3,B:3,C:3,D:3);
+        </input>
+    </tree>
+
+    <trait id='traitset' spec='beast.evolution.tree.TraitSet' traitname='date-forward' units='day'
+           value='
+		A  = 1.0,
+		B  = 1.0,
+		C  = 0.0,
+		D  = 0.0'>
+        <taxa idref='taxonset'/>
+    </trait>
+
+    <tree spec='Tree' id="tree-1">
+        <initial idref='initial-tree-1'/>
+        <trait idref='traitset'/>
+        <taxonset idref='taxonset'/>
+    </tree>
+
+    <!-- COL 2 -->
+
+    <tree spec='beast.util.TreeParser' id='initial-tree-2'>
+        <taxonset idref='taxonset'/>
+        <input name='newick'>
+            ((A:0.67,B:0.67):2.33,C:1.33,D:1.33);
+        </input>
+    </tree>
+
+    <tree spec='Tree' id="tree-2">
+        <initial idref='initial-tree-2'/>
+        <trait idref='traitset'/>
+        <taxonset idref='taxonset'/>
+    </tree>
+
+
+    <run spec='beast.app.draw.tree.TreeDrawingGrid' fileName="figure_SerialSampling.tex" width="80" height="80"
+         strideLength="2"
+         isHorizontalStride="true" columnSpacer="58" rowSpacer="32" pdflatexPath="/usr/texbin/pdflatex">
+
+        <plate var="n" range="2,1">
+
+            <treeDrawing spec='beast.app.draw.tree.RootedTreeDrawing' showLeafLabels="true"
+                         lineThickness="1.25" leafLabelOffset="10" orientation="down" nodePositioning="triangulated"
+                         branchStyle="line">
+                <tree idref="tree-$(n)"/>
+                <leafTimesDecorator spec='beast.app.draw.tree.NodeTimesDecorator' showLabels="true" labels="0,$\tau$"/>
+                <!--<internalNodeTimesDecorator spec='beast.app.draw.tree.NodeTimesDecorator' showLabels="false"
+          labels="$t_{AB}$,$t_{CD}$,$t_{root}$"/>      -->
+            </treeDrawing>
+        </plate>
+    </run>
+</beast>
+
