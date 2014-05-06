@@ -1,7 +1,7 @@
 package beast.app.draw.tree;
 
 import beast.core.Input;
-import beast.core.Plugin;
+import beast.core.BEASTObject;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * @author Alexei Drummond
  */
-public class ColorPlugin extends Plugin {
+public class ColorPlugin extends BEASTObject {
 
     public Input<String> colorInput = new Input<String>("color", "The color. Valid values are " + Arrays.toString(ColorName.values()) + " (default 'black'). Comma-delimited triplets of 0-255 are also permitted (e.g '128,128,0')", "black");
 

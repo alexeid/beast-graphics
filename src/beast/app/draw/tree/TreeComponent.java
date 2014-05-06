@@ -363,7 +363,7 @@ public class TreeComponent extends JComponent {
 
     private void drawNodeTimes(TreeIntervals treeIntervals, Graphics2D g) {
 
-        Tree tree = treeIntervals.m_tree.get();
+        Tree tree = treeIntervals.treeInput.get();
         Stroke s = g.getStroke();
         g.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10, new float[]{1.0f, 1.0f}, 0));
 

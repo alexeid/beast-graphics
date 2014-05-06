@@ -1,7 +1,7 @@
 package beast.app.draw.tree;
 
 import beast.core.Input;
-import beast.core.Plugin;
+import beast.core.BEASTObject;
 import beast.evolution.tree.Tree;
 import org.jtikz.TikzRenderingHints;
 
@@ -12,7 +12,7 @@ import java.util.Arrays;
 /**
  * @author Alexei Drummond
  */
-public abstract class AbstractTreeDrawing extends Plugin {
+public abstract class AbstractTreeDrawing extends BEASTObject {
 
     enum RotateTree {none, ladderizeLeft, ladderizeRight}
 

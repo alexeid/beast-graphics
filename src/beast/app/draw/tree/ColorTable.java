@@ -1,7 +1,7 @@
 package beast.app.draw.tree;
 
 import beast.core.Input;
-import beast.core.Plugin;
+import beast.core.BEASTObject;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * @author Alexei Drummond
  */
-public class ColorTable extends Plugin {
+public class ColorTable extends BEASTObject {
     
     public Input<List<ColorPlugin>> colorsInput = new Input<List<ColorPlugin>>("color","A list of colors in the color table", new ArrayList<ColorPlugin>());
 

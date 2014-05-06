@@ -1,14 +1,14 @@
 package beast.app.draw.tree;
 
 import beast.core.Input;
-import beast.core.Plugin;
+import beast.core.BEASTObject;
 
 import java.util.Arrays;
 
 /**
  * @author Alexei Drummond
  */
-public class NodeTimesDecorator extends Plugin {
+public class NodeTimesDecorator extends BEASTObject {
 
     public Input<Boolean> showNodeTimeLinesInput = new Input<Boolean>("showLines", "if true then dotted lines are displayed at each unique node height.", true);
     public Input<Boolean> showNodeTimeLabelsInput = new Input<Boolean>("showLabels", "if true then height is used to label each unique node height.", true);

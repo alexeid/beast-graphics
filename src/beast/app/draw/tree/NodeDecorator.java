@@ -1,7 +1,7 @@
 package beast.app.draw.tree;
 
 import beast.core.Input;
-import beast.core.Plugin;
+import beast.core.BEASTObject;
 import beast.evolution.tree.Node;
 
 import java.awt.*;
@@ -10,7 +10,7 @@ import java.util.Arrays;
 /**
  * @author Alexei Drummond
  */
-public class NodeDecorator extends Plugin {
+public class NodeDecorator extends BEASTObject {
 
     public Input<ColorPlugin> colorInput = new Input<ColorPlugin>("fillColor", "The color to fill node");
     public Input<Double> nodeSizeInput = new Input<Double>("nodeSize", "The size in points of the shape drawn to represent node", 5.0);
