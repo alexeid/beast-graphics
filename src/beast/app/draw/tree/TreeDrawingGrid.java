@@ -163,7 +163,7 @@ public class TreeDrawingGrid extends beast.core.Runnable {
         if (!fileName.equals("")) {
             out = new PrintStream(new FileOutputStream(fileName));
         }
-        out.println("\\documentclass[12pt]{article}");
+        out.println("\\documentclass[11pt,class=article,border={5pt 5pt 5pt 5pt}]{standalone}");
         out.println("\\usepackage{tikz,pgf}");
         out.println("\\begin{document}");
 
