@@ -58,11 +58,11 @@ public class ColorPlugin extends BEASTObject {
         this.color = color;
     }
 
-    public void initAndValidate() throws Exception {
+    public void initAndValidate() {
         color = getColorFromString(colorInput.get());
     }
 
-    private Color getColorFromString(String colorString) throws Exception {
+    private Color getColorFromString(String colorString) {
         String[] colors = colorString.split(",");
         if (colors.length != 3) {
             // try to interpret as ColorName

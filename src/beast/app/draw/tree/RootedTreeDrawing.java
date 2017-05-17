@@ -51,7 +51,7 @@ public class RootedTreeDrawing extends AbstractTreeDrawing {
         initAndValidate();
     }
 
-    public void initAndValidate() throws Exception {
+    public void initAndValidate() {
         if (leafTimesDecorator.get() != null || internalNodeTimesDecorator.get() != null) {
             treeIntervals = new TreeIntervals(treeInput.get());
         }
