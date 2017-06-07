@@ -1,5 +1,5 @@
 <beast version='2.0'
-       namespace='beast.core:beast.evolution.alignment:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood'>
+       namespace='beast.evolution.tree:beast.core:beast.evolution.alignment:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood'>
 
     <!-- figure 2.3 for BEAST book -->
 
@@ -13,13 +13,14 @@
 
     <!-- COL 1 -->
 
-    <tree spec='beast.util.TreeParser' id='initial-tree-1'>
+    <tree spec='beast.util.TreeParser' id='tree-1' adjustTipHeights='false'>
         <taxonset idref='taxonset'/>
         <input name='newick'>
-            (A:3,B:3,C:3,D:3);
+            ((A:0.67,B:0.67):2.33,(C:1.83,D:1.83):0.17);
         </input>
     </tree>
 
+    <!--
     <trait id='traitset' spec='beast.evolution.tree.TraitSet' traitname='date-forward' units='day'
            value='
 		A  = 1.0,
@@ -34,22 +35,24 @@
         <trait idref='traitset'/>
         <taxonset idref='taxonset'/>
     </tree>
+    -->
 
     <!-- COL 2 -->
 
-    <tree spec='beast.util.TreeParser' id='initial-tree-2'>
+    <tree spec='beast.util.TreeParser' id='tree-2'>
         <taxonset idref='taxonset'/>
         <input name='newick'>
-            ((A:0.67,B:0.67):2.33,C:1.33,D:1.33);
+            ((A:0.67,B:0.67):2.33,(C:1.33,D:1.33):1.67);
         </input>
     </tree>
 
+<!--
     <tree spec='Tree' id="tree-2">
         <initial idref='initial-tree-2'/>
         <trait idref='traitset'/>
         <taxonset idref='taxonset'/>
     </tree>
-
+    -->
 
     <run spec='beast.app.draw.tree.TreeDrawingGrid' fileName="figure_SerialSampling.tex" width="80" height="80"
          strideLength="2"

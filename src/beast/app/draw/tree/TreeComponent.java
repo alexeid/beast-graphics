@@ -183,8 +183,6 @@ public class TreeComponent extends JComponent {
         if (decorator.drawNodeShape()) {
             g.draw(shape);
         }
-
-        //g.setFont(oldFont);
     }
 
     void drawCanonicalString(String string, double x, double y, Object anchor, Object fontSize, SmartGraphics2D g) {
@@ -268,7 +266,6 @@ public class TreeComponent extends JComponent {
 
         return -1;
     }
-
 
     /**
      * Draws the label of a particular branch along the branch

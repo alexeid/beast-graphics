@@ -63,9 +63,7 @@ public class SmartGraphics2D extends Graphics2D {
 
         if (nodeAnchorHint != null) {
             Rectangle2D stringBounds = getFontMetrics().getStringBounds(s,parent);
-            
-            //System.out.println("stringBounds=" + stringBounds);
-            
+
             double stringWidth = stringBounds.getWidth();
             if (nodeAnchorHint.equals(TikzRenderingHints.VALUE_SOUTH)) {
                 parent.drawString(s,(float)(x - stringWidth/2.0),(float)(y - stringBounds.getMaxY()));

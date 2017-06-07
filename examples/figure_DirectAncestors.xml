@@ -17,7 +17,7 @@
         <taxa idref='taxonset'/>
     </trait>
 
-    <tree spec='SampledAncestorTree' id='tree-1'>
+    <tree spec='Tree' id='tree-1'>
         <taxonset idref='taxonset'/>
         <trait idref='traitset'/>
     </tree>
