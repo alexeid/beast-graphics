@@ -109,4 +109,12 @@ public class Node {
             collectLeaves(child, leaves);
         }
     }
+
+    public Node getChild(int i) {
+        return children.get(i);
+    }
+
+    public Node getParent(int i) {
+        return parents.get(i);
+    }
 }

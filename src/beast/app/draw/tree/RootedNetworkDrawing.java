@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class RootedNetworkDrawing extends JComponent {
 
-    public static int BORDER = 20;
+    public static int BORDER = 80;
     public static int NODE_RADIUS = 5;
 
     Node root;
@@ -29,19 +29,23 @@ public class RootedNetworkDrawing extends JComponent {
 
         System.out.println("leaves.size=" + leaves.size());
 
-        double xScale = (getWidth() - 2.0 * BORDER) / (leaves.size()-1.0);
+        double xScale = (getWidth() - 2.0 * BORDER) / (leaves.size() - 1.0);
 
-        double yScale = (getHeight() - 2.0*BORDER) / root.getTime();
+        double yScale = (getHeight() - 2.0 * BORDER) / root.getTime();
 
         for (int i = 0; i < leaves.size(); i++) {
             Node leaf = leaves.get(i);
-            leaf.x = (i*xScale)+BORDER;
+            leaf.x = (i * xScale) + BORDER;
         }
 
         setXY(root, true, yScale);
-        setXY(root, false, yScale);
 
-        paintNode(root, g);
+        for (int i = 0; i < 2; i++) {
+            //paintNode(root, g, Color.gray);
+            setXY(root, false, yScale);
+        }
+        paintNode(root, g, null, true, false);
+        paintNode(root, g, null, false, true);
     }
 
     private void setXY(Node node, boolean ignoreParents, double yScale) {
@@ -60,35 +64,107 @@ public class RootedNetworkDrawing extends JComponent {
             }
         }
 
+
         if (!node.isLeaf()) {
             node.x = x / (double)xCount;
         }
+        if (node.isNetworkNode() && node.getChild(0).isLeaf()) {
+            node.x = node.getChild(0).x;
+        }
     }
 
-    private void paintNode(Node node, Graphics g) {
+    private void paintNode(Node node, Graphics g, Color color, boolean paintEdges, boolean paintNodes) {
         for (Node child : node.getChildIterable()) {
-            paintNode(child, g);
-            paintEdge(node, child, g);
+            paintNode(child, g, color, paintEdges, paintNodes);
+            if (paintEdges) paintEdge(node, child, g, color);
         }
 
-        if (node.isLeaf())   {
-            g.setColor(Color.black);
-        } else if (node.isNetworkNode()) {
-            g.setColor(Color.green);
-        } else
+        if (color != null) {
+            g.setColor(color);
+        } else {
+            if (node.isLeaf()) {
+                g.setColor(Color.red);
+            } else if (node.isNetworkNode()) {
+                g.setColor(Color.blue);
+            } else {
+                g.setColor(Color.black);
+            }
+        }
 
-            g.fillArc((int)Math.round(node.x)-NODE_RADIUS,(int)Math.round(node.y)-NODE_RADIUS,NODE_RADIUS*2,NODE_RADIUS*2,0,360);
-
-
+        if (paintNodes) g.fillArc((int)Math.round(node.x)-NODE_RADIUS,(int)Math.round(node.y)-NODE_RADIUS,NODE_RADIUS*2,NODE_RADIUS*2,0,360);
     }
 
-    private void paintEdge(Node node, Node child, Graphics g) {
-        g.drawLine(
-                (int)Math.round(node.x),
-                (int)Math.round(node.y),
-                (int)Math.round(child.x),
-                (int)Math.round(child.y)
-        );
+    private void paintEdge(Node node, Node child, Graphics g, Color color) {
+        if (color == null) color = Color.black;
+        g.setColor(color);
+        ((Graphics2D)g).setStroke(new BasicStroke(2.0f));
+
+        double midx = (node.x + child.x) / 2.0;
+
+        if (node.isDivergenceNode() && child.isNetworkNode()) {
+
+            if (child.getParent(0) == node && node.x > child.x) {
+                Node op = child.getParent(1);
+                midx = child.x - Math.abs((op.x - child.x) / 2.0);
+            }
+            if (child.getParent(1) == node && node.x < child.x) {
+                Node op = child.getParent(0);
+                midx = child.x + Math.abs((op.x - child.x) / 2.0);
+            }
+
+            g.drawLine(
+                    (int)Math.round(node.x),
+                    (int)Math.round(node.y),
+                    (int)Math.round(midx),
+                    (int)Math.round(node.y)
+            );
+            g.drawLine(
+                    (int)Math.round(midx),
+                    (int)Math.round(node.y),
+                    (int)Math.round(midx),
+                    (int)Math.round(child.y)
+            );
+            g.drawLine(
+                    (int)Math.round(midx),
+                    (int)Math.round(child.y),
+                    (int)Math.round(child.x),
+                    (int)Math.round(child.y)
+            );
+        } else if (node.isNetworkNode() && child.isNetworkNode()) {
+            g.drawLine(
+                    (int)Math.round(node.x),
+                    (int)Math.round(node.y),
+                    (int)Math.round(node.x),
+                    (int)Math.round(child.y)
+            );
+            g.drawLine(
+                    (int)Math.round(node.x),
+                    (int)Math.round(child.y),
+                    (int)Math.round(child.x),
+                    (int)Math.round(child.y)
+            );
+        } else if (node.isDivergenceNode() && !child.isNetworkNode()) {
+
+            g.drawLine(
+                    (int)Math.round(node.x),
+                    (int)Math.round(node.y),
+                    (int)Math.round(child.x),
+                    (int)Math.round(node.y)
+            );
+            g.drawLine(
+                    (int)Math.round(child.x),
+                    (int)Math.round(node.y),
+                    (int)Math.round(child.x),
+                    (int)Math.round(child.y)
+            );
+        } else {
+            g.drawLine(
+                    (int) Math.round(node.x),
+                    (int) Math.round(node.y),
+                    (int) Math.round(child.x),
+                    (int) Math.round(child.y)
+            );
+        }
     }
 
     public static void main(String[] args) {
