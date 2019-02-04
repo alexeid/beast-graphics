@@ -1,6 +1,7 @@
 package beast.app.draw.tree;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -92,6 +93,7 @@ public class Node {
     public void removeChild(Node node) {
         if (children == null) throw new IllegalArgumentException("No children to remove!");
         children.remove(node);
+        node.parents.remove(this);
     }
 
     public double getTime() {
@@ -116,5 +118,14 @@ public class Node {
 
     public Node getParent(int i) {
         return parents.get(i);
+    }
+
+    public List<Node> removeChildren() {
+        List<Node> c = children;
+        children = null;
+        for (int i = 0; i < c.size(); i++) {
+            c.get(i).parents.remove(this);
+        }
+        return c;
     }
 }

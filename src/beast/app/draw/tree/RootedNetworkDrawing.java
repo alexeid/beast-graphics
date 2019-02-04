@@ -2,8 +2,11 @@ package beast.app.draw.tree;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by adru001 on 1/02/19.
@@ -40,7 +43,7 @@ public class RootedNetworkDrawing extends JComponent {
 
         setXY(root, true, yScale);
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 100; i++) {
             //paintNode(root, g, Color.gray);
             setXY(root, false, yScale);
         }
@@ -52,6 +55,7 @@ public class RootedNetworkDrawing extends JComponent {
         node.y = BORDER + (root.getTime() - node.getTime()) * yScale;
         double x = 0;
         int xCount = 0;
+
         for (Node child : node.getChildIterable()) {
             setXY(child, ignoreParents, yScale);
             x += child.x;
@@ -68,7 +72,7 @@ public class RootedNetworkDrawing extends JComponent {
         if (!node.isLeaf()) {
             node.x = x / (double)xCount;
         }
-        if (node.isNetworkNode() && node.getChild(0).isLeaf()) {
+        if (node.isNetworkNode()) {
             node.x = node.getChild(0).x;
         }
     }
@@ -101,69 +105,80 @@ public class RootedNetworkDrawing extends JComponent {
 
         double midx = (node.x + child.x) / 2.0;
 
-        if (node.isDivergenceNode() && child.isNetworkNode()) {
-
-            if (child.getParent(0) == node && node.x > child.x) {
-                Node op = child.getParent(1);
-                midx = child.x - Math.abs((op.x - child.x) / 2.0);
-            }
-            if (child.getParent(1) == node && node.x < child.x) {
-                Node op = child.getParent(0);
-                midx = child.x + Math.abs((op.x - child.x) / 2.0);
-            }
-
-            g.drawLine(
-                    (int)Math.round(node.x),
-                    (int)Math.round(node.y),
-                    (int)Math.round(midx),
-                    (int)Math.round(node.y)
-            );
-            g.drawLine(
-                    (int)Math.round(midx),
-                    (int)Math.round(node.y),
-                    (int)Math.round(midx),
-                    (int)Math.round(child.y)
-            );
-            g.drawLine(
-                    (int)Math.round(midx),
-                    (int)Math.round(child.y),
-                    (int)Math.round(child.x),
-                    (int)Math.round(child.y)
-            );
-        } else if (node.isNetworkNode() && child.isNetworkNode()) {
-            g.drawLine(
-                    (int)Math.round(node.x),
-                    (int)Math.round(node.y),
-                    (int)Math.round(node.x),
-                    (int)Math.round(child.y)
-            );
-            g.drawLine(
-                    (int)Math.round(node.x),
-                    (int)Math.round(child.y),
-                    (int)Math.round(child.x),
-                    (int)Math.round(child.y)
-            );
-        } else if (node.isDivergenceNode() && !child.isNetworkNode()) {
-
-            g.drawLine(
-                    (int)Math.round(node.x),
-                    (int)Math.round(node.y),
-                    (int)Math.round(child.x),
-                    (int)Math.round(node.y)
-            );
-            g.drawLine(
-                    (int)Math.round(child.x),
-                    (int)Math.round(node.y),
-                    (int)Math.round(child.x),
-                    (int)Math.round(child.y)
-            );
-        } else {
+        if (true) {
             g.drawLine(
                     (int) Math.round(node.x),
                     (int) Math.round(node.y),
                     (int) Math.round(child.x),
                     (int) Math.round(child.y)
             );
+
+        }   else {
+
+            if (node.isDivergenceNode() && child.isNetworkNode()) {
+
+                if (child.getParent(0) == node && node.x > child.x) {
+                    Node op = child.getParent(1);
+                    midx = child.x - Math.abs((op.x - child.x) / 2.0);
+                }
+                if (child.getParent(1) == node && node.x < child.x) {
+                    Node op = child.getParent(0);
+                    midx = child.x + Math.abs((op.x - child.x) / 2.0);
+                }
+
+                g.drawLine(
+                        (int) Math.round(node.x),
+                        (int) Math.round(node.y),
+                        (int) Math.round(midx),
+                        (int) Math.round(node.y)
+                );
+                g.drawLine(
+                        (int) Math.round(midx),
+                        (int) Math.round(node.y),
+                        (int) Math.round(midx),
+                        (int) Math.round(child.y)
+                );
+                g.drawLine(
+                        (int) Math.round(midx),
+                        (int) Math.round(child.y),
+                        (int) Math.round(child.x),
+                        (int) Math.round(child.y)
+                );
+            } else if (node.isNetworkNode() && child.isNetworkNode()) {
+                g.drawLine(
+                        (int) Math.round(node.x),
+                        (int) Math.round(node.y),
+                        (int) Math.round(node.x),
+                        (int) Math.round(child.y)
+                );
+                g.drawLine(
+                        (int) Math.round(node.x),
+                        (int) Math.round(child.y),
+                        (int) Math.round(child.x),
+                        (int) Math.round(child.y)
+                );
+            } else if (node.isDivergenceNode() && !child.isNetworkNode()) {
+
+                g.drawLine(
+                        (int) Math.round(node.x),
+                        (int) Math.round(node.y),
+                        (int) Math.round(child.x),
+                        (int) Math.round(node.y)
+                );
+                g.drawLine(
+                        (int) Math.round(child.x),
+                        (int) Math.round(node.y),
+                        (int) Math.round(child.x),
+                        (int) Math.round(child.y)
+                );
+            } else {
+                g.drawLine(
+                        (int) Math.round(node.x),
+                        (int) Math.round(node.y),
+                        (int) Math.round(child.x),
+                        (int) Math.round(child.y)
+                );
+            }
         }
     }
 
@@ -193,9 +208,23 @@ public class RootedNetworkDrawing extends JComponent {
         i2.addChildren(i1, e3);
         i1.addChild(e2);
 
+        Random random = new Random(778);
+
+        root = CoalescentWithRecombination.simulate(10,1,0.5, random);
+
         JFrame frame = new JFrame("RootedNetworkDrawing");
 
         RootedNetworkDrawing drawing = new RootedNetworkDrawing(root);
+
+        drawing.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                Node root = CoalescentWithRecombination.simulate(10, 1, 0.5, random);
+                drawing.setRoot(root);
+                frame.repaint();
+            }
+        });
 
         frame.getContentPane().add(drawing);
 
@@ -203,6 +232,13 @@ public class RootedNetworkDrawing extends JComponent {
         frame.setVisible(true);
     }
 
+    public void setRoot(Node root) {
+        this.root = root;
+    }
+
+    public Node getRoot() {
+        return root;
+    }
 }
 
 
