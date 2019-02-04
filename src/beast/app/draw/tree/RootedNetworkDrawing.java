@@ -43,38 +43,50 @@ public class RootedNetworkDrawing extends JComponent {
 
         setXY(root, true, yScale);
 
-        for (int i = 0; i < 100; i++) {
-            //paintNode(root, g, Color.gray);
-            setXY(root, false, yScale);
-        }
+        //for (int i = 0; i < 100; i++) {
+        //    //paintNode(root, g, Color.gray);
+        //    setXY(root, false, yScale);
+        //}
         paintNode(root, g, null, true, false);
         paintNode(root, g, null, false, true);
     }
 
     private void setXY(Node node, boolean ignoreParents, double yScale) {
         node.y = BORDER + (root.getTime() - node.getTime()) * yScale;
-        double x = 0;
-        int xCount = 0;
+        List<Double> x = new ArrayList<>();
+        List<Double> weight = new ArrayList<>();
 
         for (Node child : node.getChildIterable()) {
             setXY(child, ignoreParents, yScale);
-            x += child.x;
-            xCount += 1;
+            x.add(child.x);
+            weight.add(1.0/Math.abs(node.time-child.time));
         }
         if (!ignoreParents) {
             for (Node parent : node.getParentIterable()) {
-                x += parent.x;
-                xCount += 1;
+                x.add(parent.x);
+                weight.add(1.0/Math.abs(node.time-parent.time));
             }
         }
 
 
         if (!node.isLeaf()) {
-            node.x = x / (double)xCount;
+            node.x = weightedAverage(x,weight);
         }
-        if (node.isNetworkNode()) {
-            node.x = node.getChild(0).x;
+        //if (node.isNetworkNode()) {
+        //    node.x = node.getChild(0).x;
+        //}
+    }
+
+    private double weightedAverage(List<Double> x, List<Double> weight) {
+        double totalWeight = 0.0;
+        for (Double w : weight) {
+            totalWeight += w;
         }
+        double wa = 0.0;
+        for (int i = 0; i < x.size(); i++) {
+            wa += x.get(i) * (weight.get(i)/totalWeight);
+        }
+        return wa;
     }
 
     private void paintNode(Node node, Graphics g, Color color, boolean paintEdges, boolean paintNodes) {

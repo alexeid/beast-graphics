@@ -50,7 +50,10 @@ public class CoalescentWithRecombination {
             }
             time += dt;
         }
-        return activeNodes.get(0);
+        Node rootRoot = activeNodes.get(0);
+        Node root = rootRoot.getChild(0);
+        rootRoot.removeChild(root);
+        return root;
     }
 
     private static Node merge(Node c1, Node c2) {
