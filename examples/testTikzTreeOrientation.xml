@@ -1,7 +1,11 @@
-<beast version='2.0'
-       namespace='beast.core:beast.evolution.alignment:beast.evolution.tree.coalescent:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood'>
+<beast version='2.7'
+       namespace='beast.base.core:beast.base.inference:beast.base.evolution.alignment:
+                  beast.base.evolution.tree.coalescent:beast.base.util:beast.base.math:beast.evolution.nuc:
+                  beast.base.evolution.operator:beast.base.inference.operator:beast.base.evolution.sitemodel:
+                  beast.base.evolution.substitutionmodel:beast.base.evolution.likelihood:
+                  beastgraphics.app.draw.tree:beastgraphics.jtikz'>
 
-    <tree spec='beast.util.TreeParser' id='tree'>
+    <tree spec='beast.base.evolution.tree.TreeParser' id='tree'>
         <taxonset spec='TaxonSet' id='taxonset'>
             <taxon spec='Taxon' id='A'/>
             <taxon spec='Taxon' id='B'/>
@@ -16,17 +20,17 @@
     </tree>
 
     <plate var="n" range="up,right,down,left">
-        <treeDrawing spec='beast.app.draw.tree.RootedTreeDrawing' id='treeDrawing-$(n)' showLeafLabels="true"
+        <treeDrawing spec='beastgraphics.app.draw.tree.RootedTreeDrawing' id='treeDrawing-$(n)' showLeafLabels="true"
                      lineThickness="1.25" branchLabels="&amp;rate"
                      orientation='$(n)'>
-            <leafTimesDecorator spec='beast.app.draw.tree.NodeTimesDecorator' showLines="true" showLabels="true"/>
-            <internalNodeTimesDecorator spec='beast.app.draw.tree.NodeTimesDecorator' showLines="true"
+            <leafTimesDecorator spec='beastgraphics.app.draw.tree.NodeTimesDecorator' showLines="true" showLabels="true"/>
+            <internalNodeTimesDecorator spec='beastgraphics.app.draw.tree.NodeTimesDecorator' showLines="true"
                                         showLabels="true"/>
             <tree idref='tree'/>
         </treeDrawing>
     </plate>
 
-    <run spec='beast.app.draw.tree.TreeDrawingGrid' fileName="testTikzTreeOrientation.tex" width="120" height="120"
+    <run spec='beastgraphics.app.draw.tree.TreeDrawingGrid' fileName="testTikzTreeOrientation.tex" width="120" height="120"
          oneScale="false"
          strideLength="2" columnSpacer="60" rowSpacer="60" pdflatexPath="/usr/texbin/pdflatex">
         <plate var="n" range="up,right,down,left">

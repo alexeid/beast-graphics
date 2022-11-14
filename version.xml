@@ -1,0 +1,35 @@
+<package name="BeastGraphics" version="0.0.1"
+         description="Creating tree figures in the BEAST2 framework"
+         projectURL="https://github.com/alexeid/beast-graphics">
+    <depends on='BEAST.base' atleast='2.7.2'/>
+    <depends on='BEAST.app' atleast='2.7.2'/>
+    <depends on='BEASTLabs' atleast='2.0.0'/>
+
+    <service type="beast.base.core.BEASTInterface">
+        <provider classname="beastgraphics.app.draw.tree.AbstractTreeDrawing"/>
+        <provider classname="beastgraphics.app.draw.tree.BranchStyle"/>
+        <provider classname="beastgraphics.app.draw.tree.CoalescentWithRecombination"/>
+        <provider classname="beastgraphics.app.draw.tree.ColorPlugin"/>
+        <provider classname="beastgraphics.app.draw.tree.ColorTable"/>
+        <provider classname="beastgraphics.app.draw.tree.FontSize"/>
+        <provider classname="beastgraphics.app.draw.tree.Node"/>
+        <provider classname="beastgraphics.app.draw.tree.NodeDecorator"/>
+        <provider classname="beastgraphics.app.draw.tree.NodePositioningRule"/>
+        <provider classname="beastgraphics.app.draw.tree.NodeTimesDecorator"/>
+        <provider classname="beastgraphics.app.draw.tree.RootedNetworkDrawing"/>
+        <provider classname="beastgraphics.app.draw.tree.RootedTreeDrawing"/>
+        <provider classname="beastgraphics.app.draw.tree.SmartGraphics2D"/>
+        <provider classname="beastgraphics.app.draw.tree.TreeComponent"/>
+        <provider classname="beastgraphics.app.draw.tree.TreeDrawingGrid"/>
+        <provider classname="beastgraphics.app.draw.tree.TreeDrawingOrientation"/>
+        <provider classname="beastgraphics.app.draw.tree.UnrootedTreeDrawing"/>
+        <provider classname="beastgraphics.jtikz.AbstractGraphicsInterface"/>
+        <provider classname="beastgraphics.jtikz.GraphicsCommand"/>
+        <provider classname="beastgraphics.jtikz.GraphicsInterfaceImage"/>
+        <provider classname="beastgraphics.jtikz.GraphicsInterfaceRepaintManager"/>
+        <provider classname="beastgraphics.jtikz.JTikzIcon"/>
+        <provider classname="beastgraphics.jtikz.TikzGraphics2D"/>
+        <provider classname="beastgraphics.jtikz.TikzRenderingHints"/>
+    </service>
+
+</package>

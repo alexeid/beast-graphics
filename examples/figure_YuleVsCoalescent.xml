@@ -1,7 +1,11 @@
-<beast version='2.0'
-       namespace='beast.core:beast.evolution.alignment:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood'>
+<beast version='2.7'
+       namespace='beast.base.core:beast.base.inference:beast.base.evolution.alignment:
+                  beast.base.evolution.tree.coalescent:beast.base.util:beast.base.math:beast.evolution.nuc:
+                  beast.base.evolution.operator:beast.base.inference.operator:beast.base.evolution.sitemodel:
+                  beast.base.evolution.substitutionmodel:beast.base.evolution.likelihood:
+                  beastgraphics.app.draw.tree:beastgraphics.jtikz'>
 
-    <!-- figure 7.1 for the BEAST2 book -->
+<!-- figure 7.1 for the BEAST2 book -->
 
     <taxonset spec='TaxonSet' id='taxonset'>
 		<taxon spec="Taxon" id='1'/>
@@ -37,7 +41,7 @@
     </taxonset>
 
 
-    <tree spec='beast.util.TreeParser' id='yuletree'>
+    <tree spec='beast.base.evolution.tree.TreeParser' id='yuletree'>
         <taxonset idref='taxonset'/>
         <input name='newick'>
             <!-- (((((((17[type="X",time=4.54774]:0.02530991188837106,14[type="X",time=4.54774]:0.02530991188837106)[type="X",reaction="Speciation",time=4.522430088111629]:0.704750597095845,(9[type="X",time=4.54774]:0.09487771928261512,18[type="X",time=4.54774]:0.09487771928261512)[type="X",reaction="Speciation",time=4.452862280717385]:0.6351827897016009)[type="X",reaction="Speciation",time=3.817679491015784]:0.050580186590865495,12[type="X",time=4.54774]:0.7806406955750815)[type="X",reaction="Speciation",time=3.7670993044249186]:0.18271601868615184,5[type="X",time=4.54774]:0.9633567142612334)[type="X",reaction="Speciation",time=3.5843832857387667]:0.702680273622005,(11[type="X",time=4.54774]:1.100536774437837,(8[type="X",time=4.54774]:0.40120624484191403,(20[type="X",time=4.54774]:0.2892110195113462,(1[type="X",time=4.54774]:0.27015795736106174,(6[type="X",time=4.54774]:0.170502482751842,16[type="X",time=4.54774]:0.170502482751842)[type="X",reaction="Speciation",time=4.377237517248158]:0.09965547460921975)[type="X",reaction="Speciation",time=4.277582042638938]:0.01905306215028446)[type="X",reaction="Speciation",time=4.258528980488654]:0.11199522533056783)[type="X",reaction="Speciation",time=4.146533755158086]:0.6993305295959229)[type="X",reaction="Speciation",time=3.447203225562163]:0.5655002134454015)[type="X",reaction="Speciation",time=2.8817030121167617]:0.4342518714752317,((4[type="X",time=4.54774]:0.16879348679097905,15[type="X",time=4.54774]:0.16879348679097905)[type="X",reaction="Speciation",time=4.378946513209021]:0.3830237656167581,((10[type="X",time=4.54774]:0.056270254298413924,3[type="X",time=4.54774]:0.056270254298413924)[type="X",reaction="Speciation",time=4.491469745701586]:0.2765004927328505,19[type="X",time=4.54774]:0.3327707470312644)[type="X",reaction="Speciation",time=4.214969252968736]:0.21904650537647274)[type="X",reaction="Speciation",time=3.995922747592263]:1.548471606950733)[type="X",reaction="Speciation",time=2.44745114064153]:1.0746846130760668,((2[type="X",time=4.54774]:0.05323980335524059,13[type="X",time=4.54774]:0.05323980335524059)[type="X",reaction="Speciation",time=4.4945001966447595]:0.9631011335818771,7[type="X",time=4.54774]:1.0163409369371177)[type="X",reaction="Speciation",time=3.5313990630628824]:2.158632535497419)[type="X",reaction="Speciation",time=1.3727665275654632]:1.3727665275654632;
@@ -55,7 +59,7 @@
         </input>
     </tree>
 
-    <tree spec='beast.util.TreeParser' id='coalescenttree'>
+    <tree spec='beast.base.evolution.tree.TreeParser' id='coalescenttree'>
         <taxonset idref='taxonset'/>
         <input name='newick'>
             <!-- ((((19[type="X",time=0.0]:0.014834834507459873,(15[type="X",time=0.0]:0.00817082972340162,5[type="X",time=0.0]:0.00817082972340162)[type="X",reaction="Coalescence",time=0.00817082972340162]:0.006664004784058252)[type="X",reaction="Coalescence",time=0.014834834507459873]:0.005127384497140631,(11[type="X",time=0.0]:0.01452128627707959,6[type="X",time=0.0]:0.01452128627707959)[type="X",reaction="Coalescence",time=0.01452128627707959]:0.005440932727520914)[type="X",reaction="Coalescence",time=0.019962219004600504]:0.12898602672720355,(13[type="X",time=0.0]:0.10466978714520592,(((8[type="X",time=0.0]:0.028683439967371122,20[type="X",time=0.0]:0.028683439967371122)[type="X",reaction="Coalescence",time=0.028683439967371122]:0.03881259402472527,((17[type="X",time=0.0]:0.02554945040232985,(9[type="X",time=0.0]:0.002807914580415585,1[type="X",time=0.0]:0.002807914580415585)[type="X",reaction="Coalescence",time=0.002807914580415585]:0.022741535821914266)[type="X",reaction="Coalescence",time=0.02554945040232985]:0.004039890583715473,12[type="X",time=0.0]:0.029589340986045324)[type="X",reaction="Coalescence",time=0.029589340986045324]:0.03790669300605107)[type="X",reaction="Coalescence",time=0.06749603399209639]:0.02188146066344024,((7[type="X",time=0.0]:0.08262854921799093,(2[type="X",time=0.0]:0.040289331063118605,14[type="X",time=0.0]:0.040289331063118605)[type="X",reaction="Coalescence",time=0.040289331063118605]:0.04233921815487232)[type="X",reaction="Coalescence",time=0.08262854921799093]:0.005186001503457285,((10[type="X",time=0.0]:0.007050514413427524,4[type="X",time=0.0]:0.007050514413427524)[type="X",reaction="Coalescence",time=0.007050514413427524]:0.01211778617931183,16[type="X",time=0.0]:0.019168300592739353)[type="X",reaction="Coalescence",time=0.019168300592739353]:0.06864625012870886)[type="X",reaction="Coalescence",time=0.08781455072144821]:0.001562943934088415)[type="X",reaction="Coalescence",time=0.08937749465553663]:0.01529229248966929)[type="X",reaction="Coalescence",time=0.10466978714520592]:0.04427845858659815)[type="X",reaction="Coalescence",time=0.14894824573180407]:0.08827928599385568,(3[type="X",time=0.0]:0.10476029075697571,18[type="X",time=0.0]:0.10476029075697571)[type="X",reaction="Coalescence",time=0.10476029075697571]:0.13246724096868404)[type="X",reaction="Coalescence",time=0.23722753172565975]:0.0;
@@ -73,17 +77,17 @@
         </input>
     </tree>
 
-    <run spec='beast.app.draw.tree.TreeDrawingGrid' fileName="figure_YuleVsCoalescent.tex" width="150" height="120"
+    <run spec='beastgraphics.app.draw.tree.TreeDrawingGrid' fileName="figure_YuleVsCoalescent.tex" width="150" height="120"
          oneScale="false"
          strideLength="3" captionPosition="north"
          isHorizontalStride="true" columnSpacer="58" rowSpacer="30" pdflatexPath="/usr/texbin/pdflatex">
 
-        <treeDrawing spec='beast.app.draw.tree.RootedTreeDrawing' showLeafLabels="false"
+        <treeDrawing spec='beastgraphics.app.draw.tree.RootedTreeDrawing' showLeafLabels="false"
                      lineThickness="1.25" leafLabelOffset="10" rotateTree="ladderizeLeft"
                      orientation="down" nodePositioning="average" branchStyle="square" caption="(a) Yule tree">
             <tree idref="yuletree"/>
         </treeDrawing>
-        <treeDrawing spec='beast.app.draw.tree.RootedTreeDrawing' showLeafLabels="false"
+        <treeDrawing spec='beastgraphics.app.draw.tree.RootedTreeDrawing' showLeafLabels="false"
                      lineThickness="1.25" leafLabelOffset="10" rotateTree="ladderizeLeft" orientation="down"
                      nodePositioning="average" branchStyle="square" caption="(b) Coalescent tree">
             <tree idref="coalescenttree"/>
