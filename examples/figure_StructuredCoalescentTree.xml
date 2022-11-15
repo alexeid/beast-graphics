@@ -1,21 +1,25 @@
-<beast version='2.0'
-       namespace='beast.core:beast.evolution.alignment:beast.evolution.tree.coalescent:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood'>
+<beast version='2.7'
+       namespace='beast.base.core:beast.base.inference:beast.base.evolution.alignment:
+                  beast.base.evolution.tree.coalescent:beast.base.util:beast.base.math:beast.evolution.nuc:
+                  beast.base.evolution.operator:beast.base.inference.operator:beast.base.evolution.sitemodel:
+                  beast.base.evolution.substitutionmodel:beast.base.evolution.likelihood:
+                  beastgraphics.app.draw.tree:beastgraphics.jtikz'>
 
 
-    <colorTable id='traitColorTable' spec='beast.app.draw.tree.ColorTable'>
-        <color spec='beast.app.draw.tree.ColorPlugin' color="pink"/>
-        <color spec='beast.app.draw.tree.ColorPlugin' color="green"/>
-        <color spec='beast.app.draw.tree.ColorPlugin' color="127,127,255"/>
-        <color spec='beast.app.draw.tree.ColorPlugin' color="orange"/>
+<colorTable id='traitColorTable' spec='beastgraphics.app.draw.tree.ColorTable'>
+        <color spec='beastgraphics.app.draw.tree.ColorPlugin' color="pink"/>
+        <color spec='beastgraphics.app.draw.tree.ColorPlugin' color="green"/>
+        <color spec='beastgraphics.app.draw.tree.ColorPlugin' color="127,127,255"/>
+        <color spec='beastgraphics.app.draw.tree.ColorPlugin' color="orange"/>
     </colorTable>
 
     <plate var="n" range="1,2,3">
-        <treeDrawing spec='beast.app.draw.tree.RootedTreeDrawing' id='treeDrawing-$(n)' orientation="right"
+        <treeDrawing spec='beastgraphics.app.draw.tree.RootedTreeDrawing' id='treeDrawing-$(n)' orientation="right"
                      showLeafLabels="false"
                      lineThickness="1.25" rotateTree="ladderizeRight" colorTrait="deme">
             <traitColorTable idref='traitColorTable'/>
 
-            <tree spec='beast.evolution.tree.coalescent.StructuredCoalescentTree'>
+            <tree spec='beastlabs.evolution.tree.coalescent.StructuredCoalescentTree'>
 
                 <popSizesMigrationRates spec='parameter.RealParameter' dimension="4" minordimension="2"
                                         value='1000 0.00025 0.00025 1000'/>
@@ -24,7 +28,7 @@
         </treeDrawing>
     </plate>
 
-    <run spec='beast.app.draw.tree.TreeDrawingGrid' fileName="figure_StructuredCoalescentTree.tex" width="250"
+    <run spec='beastgraphics.app.draw.tree.TreeDrawingGrid' fileName="figure_StructuredCoalescentTree.tex" width="250"
          strideLength="1" rowSpacer="20" columnSpacer="15" oneScale="true"
          height="100" debug="false" pdflatexPath="/usr/texbin/pdflatex">
         <plate var="n" range="1,2,3">

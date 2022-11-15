@@ -1,7 +1,11 @@
-<beast version='2.0'
-       namespace='beast.core:beast.evolution.alignment:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood'>
+<beast version='2.7'
+       namespace='beast.base.core:beast.base.inference:beast.base.evolution.alignment:
+                  beast.base.evolution.tree.coalescent:beast.base.util:beast.base.math:beast.evolution.nuc:
+                  beast.base.evolution.operator:beast.base.inference.operator:beast.base.evolution.sitemodel:
+                  beast.base.evolution.substitutionmodel:beast.base.evolution.likelihood:
+                  beastgraphics.app.draw.tree:beastgraphics.jtikz'>
 
-    <!-- figure 2.2 for BEAST book -->
+<!-- figure 2.2 for BEAST book -->
 
     <taxonset spec='TaxonSet' id='taxonset'>
         <taxon spec='Taxon' id='A'/>
@@ -12,43 +16,43 @@
     </taxonset>
 
 
-    <tree spec='beast.util.TreeParser' id='atree'>
+    <tree spec='beast.base.evolution.tree.TreeParser' id='atree'>
         <taxonset idref='taxonset'/>
         <input name='newick'>
             ((A:3,B:3):0,((C:3,D:3):0,E:3):0);
         </input>
     </tree>
 
-    <tree spec='beast.util.TreeParser' id='btree'>
+    <tree spec='beast.base.evolution.tree.TreeParser' id='btree'>
         <taxonset idref='taxonset'/>
         <input name='newick'>
             ((A:1.5,B:1.5):1.5,((C:2,D:2):0,E:2):1);
         </input>
     </tree>
 
-    <tree spec='beast.util.TreeParser' id='ctree'>
+    <tree spec='beast.base.evolution.tree.TreeParser' id='ctree'>
         <taxonset idref='taxonset'/>
         <input name='newick'>
             ((A:1.5,B:1.5):1.5,((C:1,D:1):1,E:2):1);
         </input>
     </tree>
 
-    <run spec='beast.app.draw.tree.TreeDrawingGrid' fileName="figure_Polytomies.tex" width="75" height="75"
+    <run spec='beastgraphics.app.draw.tree.TreeDrawingGrid' fileName="figure_Polytomies.tex" width="75" height="75"
          oneScale="true"
          strideLength="3" captionPosition="north"
          isHorizontalStride="true" columnSpacer="58" rowSpacer="30" pdflatexPath="/usr/texbin/pdflatex">
 
-        <treeDrawing spec='beast.app.draw.tree.RootedTreeDrawing' showLeafLabels="true"
+        <treeDrawing spec='beastgraphics.app.draw.tree.RootedTreeDrawing' showLeafLabels="true"
                      lineThickness="1.25" leafLabelOffset="10"
                      orientation="down" nodePositioning="triangulated" branchStyle="line" caption="(a) a star tree">
             <tree idref="atree"/>
         </treeDrawing>
-        <treeDrawing spec='beast.app.draw.tree.RootedTreeDrawing' showLeafLabels="true"
+        <treeDrawing spec='beastgraphics.app.draw.tree.RootedTreeDrawing' showLeafLabels="true"
                      lineThickness="1.25" leafLabelOffset="10" orientation="down"
                      nodePositioning="triangulated" branchStyle="line" caption="(b) partially-resolved tree">
             <tree idref="btree"/>
         </treeDrawing>
-        <treeDrawing spec='beast.app.draw.tree.RootedTreeDrawing' showLeafLabels="true"
+        <treeDrawing spec='beastgraphics.app.draw.tree.RootedTreeDrawing' showLeafLabels="true"
                      lineThickness="1.25" leafLabelOffset="10" orientation="down"
                      nodePositioning="triangulated" branchStyle="line" caption="(c) fully-resolved tree">
             <tree idref="ctree"/>

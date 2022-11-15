@@ -1,7 +1,11 @@
-<beast version='2.0'
-       namespace='beast.core:beast.evolution.alignment:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood'>
+<beast version='2.7'
+       namespace='beast.base.core:beast.base.inference:beast.base.evolution.alignment:
+                  beast.base.evolution.tree.coalescent:beast.base.util:beast.base.math:beast.evolution.nuc:
+                  beast.base.evolution.operator:beast.base.inference.operator:beast.base.evolution.sitemodel:
+                  beast.base.evolution.substitutionmodel:beast.base.evolution.likelihood:
+                  beastgraphics.app.draw.tree:beastgraphics.jtikz'>
 
-    <!-- figure 2.1 for BEAST 2 book -->
+<!-- figure 2.1 for BEAST 2 book -->
 
     <taxonset spec='TaxonSet' id='taxonset'>
         <taxon spec='Taxon' id='A'/>
@@ -10,19 +14,19 @@
         <taxon spec='Taxon' id='D'/>
     </taxonset>
 
-    <tree spec='beast.util.TreeParser' id='tree'>
+    <tree spec='beast.base.evolution.tree.TreeParser' id='tree'>
         <taxonset idref='taxonset'/>
         <input name='newick'>
             ((A:1.0,B:2.0):0.75,(C:2.5,D:0.75):0.5);
         </input>
     </tree>
 
-    <run spec='beast.app.draw.tree.TreeDrawingGrid' fileName="figure_RootedUnrootedTree.tex" width="90" height="90"
+    <run spec='beastgraphics.app.draw.tree.TreeDrawingGrid' fileName="figure_RootedUnrootedTree.tex" width="90" height="90"
          oneScale="true"
          strideLength="2"
          isHorizontalStride="true" columnSpacer="80" rowSpacer="40" debug="false" pdflatexPath="/usr/texbin/pdflatex">
 
-        <treeDrawing spec='beast.app.draw.tree.RootedTreeDrawing' showLeafLabels="true"
+        <treeDrawing spec='beastgraphics.app.draw.tree.RootedTreeDrawing' showLeafLabels="true"
                      lineThickness="1.25" leafLabelOffset="10" orientation="right" branchStyle="square"
                      nodePositioning="average" caption="(a)">
             <tree idref="tree"/>
@@ -40,7 +44,7 @@
         <!--<tree idref="tree"/>-->
         <!--</treeDrawing>-->
 
-        <treeDrawing spec='beast.app.draw.tree.UnrootedTreeDrawing' showLeafLabels="true"
+        <treeDrawing spec='beastgraphics.app.draw.tree.UnrootedTreeDrawing' showLeafLabels="true"
                      lineThickness="1.25" leafLabelOffset="10" caption="(b)">
             <tree idref="tree"/>
         </treeDrawing>

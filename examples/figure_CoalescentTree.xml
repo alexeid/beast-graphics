@@ -1,5 +1,9 @@
-<beast version='2.0'
-       namespace='beast.core:beast.evolution.alignment:beast.evolution.tree.coalescent:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood'>
+<beast version='2.7'
+       namespace='beast.base.core:beast.base.inference:beast.base.evolution.alignment:
+                  beast.base.evolution.tree.coalescent:beast.base.util:beast.base.math:beast.evolution.nuc:
+                  beast.base.evolution.operator:beast.base.inference.operator:beast.base.evolution.sitemodel:
+                  beast.base.evolution.substitutionmodel:beast.base.evolution.likelihood:
+                  beastgraphics.app.draw.tree:beastgraphics.jtikz'>
 
     <!-- figure 2.4 for Beast 2 book -->
 
@@ -15,14 +19,14 @@
         <taxon spec='Taxon' id='G'/>
     </taxonset>
 
-    <treeDrawing spec='beast.app.draw.tree.RootedTreeDrawing' id='treeDrawing' orientation="right"
+    <treeDrawing spec='beastgraphics.app.draw.tree.RootedTreeDrawing' id='treeDrawing' orientation="right"
                  showLeafLabels="false"
                  lineThickness="1.25" rotateTree="ladderizeRight">
-        <leafTimesDecorator spec='beast.app.draw.tree.NodeTimesDecorator' labels="$t_7=0$" fontSize="normalsize"/>
-        <internalNodeTimesDecorator spec='beast.app.draw.tree.NodeTimesDecorator'
+        <leafTimesDecorator spec='beastgraphics.app.draw.tree.NodeTimesDecorator' labels="$t_7=0$" fontSize="normalsize"/>
+        <internalNodeTimesDecorator spec='beastgraphics.app.draw.tree.NodeTimesDecorator'
                                     labels="$t_6$,$t_5$,$t_4$,$t_3$,$t_2$,$t_1$" fontSize="normalsize"/>
 
-        <tree spec='beast.evolution.tree.RandomTree'>
+        <tree spec='beast.base.evolution.tree.coalescent.RandomTree'>
 
             <taxonset idref='taxonset'/>
 
@@ -32,7 +36,7 @@
         </tree>
     </treeDrawing>
 
-    <run spec='beast.app.draw.tree.TreeDrawingGrid' fileName="figure_CoalescentTree.tex" width="300"
+    <run spec='beastgraphics.app.draw.tree.TreeDrawingGrid' fileName="figure_CoalescentTree.tex" width="300"
          height="200" debug="false" pdflatexPath="/usr/texbin/pdflatex">
         <treeDrawing idref="treeDrawing"/>
     </run>

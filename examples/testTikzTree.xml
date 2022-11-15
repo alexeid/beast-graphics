@@ -1,5 +1,9 @@
-<beast version='2.0'
-       namespace='beast.core:beast.evolution.alignment:beast.evolution.tree.coalescent:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood'>
+<beast version='2.7'
+       namespace='beast.base.core:beast.base.inference:beast.base.evolution.alignment:
+                  beast.base.evolution.tree.coalescent:beast.base.util:beast.base.math:beast.evolution.nuc:
+                  beast.base.evolution.operator:beast.base.inference.operator:beast.base.evolution.sitemodel:
+                  beast.base.evolution.substitutionmodel:beast.base.evolution.likelihood:
+                  beastgraphics.app.draw.tree:beastgraphics.jtikz'>
 
     <taxonset spec='TaxonSet' id='taxonset'>
         <taxon spec='Taxon' id='A'/>
@@ -10,7 +14,7 @@
         <taxon spec='Taxon' id='F'/>
     </taxonset>
 
-    <trait id='traitset' spec='beast.evolution.tree.TraitSet' traitname='date-forward' units='day'
+    <trait id='traitset' spec='beast.base.evolution.tree.TraitSet' traitname='date-forward' units='day'
            value='
 		A  = 1,
 		B  = 1,
@@ -22,9 +26,9 @@
     </trait>
 
     <plate var="n" range="1,2,3,4,5,6,7,8,9">
-        <treeDrawing spec='beast.app.draw.tree.RootedTreeDrawing' id='treeDrawing$(n)' showLeafLabels="true"
+        <treeDrawing spec='beastgraphics.app.draw.tree.RootedTreeDrawing' id='treeDrawing$(n)' showLeafLabels="true"
                      lineThickness="1.25">
-            <tree spec='beast.evolution.tree.RandomTree'>
+            <tree spec='beast.base.evolution.tree.coalescent.RandomTree'>
 
                 <taxonset idref='taxonset'/>
                 <trait idref='traitset'/>
@@ -33,14 +37,14 @@
                     <popSize spec='parameter.RealParameter' value='1'/>
                 </populationModel>
             </tree>
-            <leafTimesDecorator spec='beast.app.draw.tree.NodeTimesDecorator' showLines="true" showLabels="false"/>
-            <internalNodeTimesDecorator spec='beast.app.draw.tree.NodeTimesDecorator' showLines="false"
+            <leafTimesDecorator spec='beastgraphics.app.draw.tree.NodeTimesDecorator' showLines="true" showLabels="false"/>
+            <internalNodeTimesDecorator spec='beastgraphics.app.draw.tree.NodeTimesDecorator' showLines="false"
                                         showLabels="false"/>
 
         </treeDrawing>
     </plate>
 
-    <run spec='beast.app.draw.tree.TreeDrawingGrid' fileName="testTikzTree.tex" width="100" height="100" oneScale="true"
+    <run spec='beastgraphics.app.draw.tree.TreeDrawingGrid' fileName="testTikzTree.tex" width="100" height="100" oneScale="true"
          rowSpacer="40" columnSpacer="30"
          strideLength="3" pdflatexPath="/usr/texbin/pdflatex">
         <plate var="n" range="1,2,3,4,5,6,7,8,9">
